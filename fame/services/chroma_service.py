@@ -7,6 +7,8 @@ import time
 from pathlib import Path
 from typing import Optional
 
+from fame.utils.runtime import workspace, print_created
+
 
 def _which(cmd: str) -> Optional[str]:
     """Return absolute path to cmd if found on PATH, else None."""
@@ -76,6 +78,7 @@ def _kill_process_on_port(port: int) -> None:
         print(f"⚠️  Killing process on port {port}: PID {pid}")
         _run_quiet(["kill", "-TERM", pid])
     time.sleep(1)
+
     for pid in pids:
         # If still alive, SIGKILL
         try:
@@ -91,7 +94,7 @@ def stop_existing(pid_file: Path, port: int) -> None:
     Stop any previous Chroma instances:
       1) stop PID in pid_file (if exists)
       2) kill anything listening on the port
-      3) kill stray chroma/chromadb run processes (Ollama-style safety net)
+      3) kill stray chroma/chromadb run processes (safety net)
     Best-effort and safe to call repeatedly.
     """
     # 1) PID file
@@ -161,7 +164,6 @@ def start_chroma(
     elif chromadb_exe:
         cmd = ["chromadb", "run", "--path", str(chroma_path), "--host", host, "--port", str(port)]
     else:
-        # Try to hint install in current python env
         raise RuntimeError(
             "Neither 'chroma' nor 'chromadb' CLI found on PATH.\n"
             "Install (same python env): python3 -m pip install -U chromadb\n"
@@ -224,9 +226,12 @@ def stop_chroma(path: str, port: int = 8000) -> None:
 
 
 if __name__ == "__main__":
+    # Workspace-aware defaults (repo root) + create needed dirs for 'vectorize'
+    ws = workspace("vectorize", base_dir=os.getenv("FAME_BASE_DIR"))
+    # print_created(ws)  # uncomment for debugging
+
     # Config via env vars for easy bash integration
-    base_dir = os.getenv("FAME_BASE_DIR", str(Path.home() / "Desktop" / "FAME_project"))
-    chroma_dir = os.getenv("CHROMA_PATH", str(Path(base_dir) / "data" / "chroma_db"))
+    chroma_dir = os.getenv("CHROMA_PATH", str(ws.paths.vector_db))
     host = os.getenv("CHROMA_HOST", "127.0.0.1")
     port = int(os.getenv("CHROMA_PORT", "8000"))
     timeout_s = int(os.getenv("STARTUP_TIMEOUT", "120"))
