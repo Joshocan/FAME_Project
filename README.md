@@ -1,4 +1,4 @@
-# Feature Arguementation Modelling Environment  (FAME) Project
+# Feature Argumentation Modelling Environment  (FAME) Project
 
 ## Setup (Automated)
 
