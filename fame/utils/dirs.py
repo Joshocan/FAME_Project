@@ -17,9 +17,10 @@ class FamePaths:
     # input / author-controlled
     raw_data: Path
     prompts: Path
-    specification: Path
+    specifications: Path
     notebooks: Path
     tests: Path
+    api_keys: Path
 
     # intermediate / generated
     processed_data: Path
@@ -30,6 +31,7 @@ class FamePaths:
     results: Path
     ss_fm: Path
     ms_fm: Path
+    modified_prompts: Path
 
     # non-rag umbrella (generated) - kept for compatibility/convenience
     non_root: Path
@@ -108,9 +110,10 @@ def build_paths(base_dir: Optional[Path] = None) -> FamePaths:
         # input / author-controlled
         raw_data=data / "raw",
         prompts=base / "prompts",
-        specification=base / "prompts" / "specification",
+        specifications=base / "prompts" / "specifications",
         notebooks=base / "notebooks",
         tests=base / "tests",
+        api_keys=base / "api_keys",
 
         # intermediate / generated
         processed_data=data / "processed" / "algorithm_1",
@@ -121,6 +124,7 @@ def build_paths(base_dir: Optional[Path] = None) -> FamePaths:
         results=results,
         ss_fm=results / "rag" / "ss-rgfm" / "fm",
         ms_fm=results / "rag" / "ms-rgfm" / "fm",
+        modified_prompts=results / "modified_prompts",
 
         # non-rag umbrella (generated) - kept for compatibility
         non_root=non_root,
@@ -199,9 +203,9 @@ def ensure_for_stage(stage: str, p: FamePaths) -> Dict[str, Path]:
     if stage in ("raw", "ingest"):
         mk("RAW_DATA", p.raw_data)
 
-    elif stage in ("prompts", "specification"):
+    elif stage in ("prompts", "specification", "specifications"):
         mk("PROMPTS", p.prompts)
-        mk("SPECIFICATION", p.specification)
+        mk("SPECIFICATIONS", p.specifications)
 
     elif stage in ("notebooks",):
         mk("NOTEBOOKS", p.notebooks)

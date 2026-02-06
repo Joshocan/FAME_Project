@@ -42,7 +42,8 @@ def ensure_base_only(base_dir: Optional[str | Path] = None) -> FameWorkspace:
       - base_dir
       - data/raw
       - prompts
-      - prompts/specification
+      - prompts/specifications
+      - api_keys
       - results (root)
     """
     p = build_paths(Path(base_dir) if base_dir is not None else None)
@@ -52,7 +53,8 @@ def ensure_base_only(base_dir: Optional[str | Path] = None) -> FameWorkspace:
         "BASE_DIR": p.base_dir,
         "RAW_DATA": p.raw_data,
         "PROMPTS": p.prompts,
-        "SPECIFICATION": p.specification,
+        "SPECIFICATIONS": p.specifications,
+        "API_KEYS": p.api_keys,
         "RESULTS": p.results,
     }.items():
         ensure_dir(d)
