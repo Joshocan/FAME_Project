@@ -1,0 +1,94 @@
+Reference Feature Metamodel Specification (LLM-Parseable)
+
+Purpose. This document defines the abstract syntax and well-formedness rules of a Feature Model (FM). 
+It is intended to be used as a reference contract in LLM prompts and for post-generation validation.
+
+1. Scope and terms
+
+- Feature Model (FM): A variability model consisting of features, hierarchical relations, groups, and cross-tree constraints.
+- Feature name: A unique identifier (string) used consistently across hierarchy, groups, and constraints.
+- Configuration: A set of selected features that satisfies all rules and constraints (informative).
+
+2. Core entities (normative)
+
+2.1 FeatureModel
+A FeatureModel is a container for all elements.
+
+MUST contain
+- root : Feature (exactly one)
+- features : Set<Feature> (non-empty)
+
+MAY contain
+- groups : Set<FeatureGroup>
+- constraints : Set<CrossTreeConstraint>
+
+2.2 Feature
+A Feature is a unit of functionality/variability.
+
+Attributes
+- name : String (unique within the FeatureModel)
+- isAbstract : Boolean (default: false)
+- parent : FeatureName | null
+- relationToParent : mandatory | optional (only if parent != null)
+- attributes : Set<Attribute> (optional extension)
+
+2.3 FeatureGroup
+A FeatureGroup expresses a choice among sibling features of a single parent.
+
+Attributes
+- parent : FeatureName (exactly one)
+- members : Set<FeatureName> (size >= 2)
+- minCardinality : Integer
+- maxCardinality : Integer
+
+Cardinality semantics
+- XOR group == <1..1>
+- OR group  == <1..|members|>
+- AND is not an explicit group; it is captured by mandatory child relations.
+
+2.4 CrossTreeConstraint
+A CrossTreeConstraint restricts valid combinations beyond the hierarchy.
+
+Attributes
+- expression : BooleanFormula (string representation)
+- referencedFeatures : Set<FeatureName> (derived or explicit)
+
+BooleanFormula
+- A propositional formula over feature names (atomic propositions).
+- Operators allowed (recommended): and, or, not, implies, parentheses.
+- The metamodel treats the expression as a string; tools are responsible for parsing and evaluating it according to standard propositional logic semantics.
+
+2.5 Attribute (optional extension)
+Attribute adds non-Boolean information to a feature.
+
+Attributes
+- name : String
+- type : String (e.g., int, float, string, enum)
+- domain : Optional[String or ValueSet]
+
+3. Well-formedness rules (normative)
+
+3.1 Structural rules
+1. The FeatureModel SHALL have exactly one root feature.
+2. Every non-root feature SHALL have exactly one parent.
+3. The feature hierarchy SHALL be acyclic.
+4. Feature names SHALL be unique within a model.
+5. Each child feature SHALL declare exactly one relationToParent in mandatory, optional.
+6. Each FeatureGroup SHALL reference only features that exist in features.
+7. Group members SHALL be children of the group's parent.
+8. FeatureGroups SHALL NOT overlap in membership for the same parent (no member appears in two groups under one parent).
+
+3.2 Cardinality rules
+9. 0 <= minCardinality <= maxCardinality <= |members|.
+
+3.3 Constraint rules
+10. Every feature referenced in any constraint expression SHALL exist in features.
+11. Constraints MAY be arbitrary propositional formulas.
+12. If referencedFeatures is present, it SHALL match the set of feature names appearing in expression.
+
+4. Configuration semantics (informative)
+A configuration is valid if:
+- the root feature is selected,
+- for any selected feature, all mandatory children are selected,
+- each FeatureGroup cardinality is satisfied when the parent is selected,
+- all CrossTreeConstraints evaluate to TRUE.
