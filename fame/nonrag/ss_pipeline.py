@@ -11,6 +11,7 @@ from fame.context import ContextBuildConfig, ContextManager, chunks_from_chunks_
 from fame.ingestion.pipeline import ingest_and_prepare
 from fame.utils.dirs import build_paths, ensure_for_stage, ensure_dir
 from fame.utils.context_budget import compute_max_total_chars, compute_max_chunks
+from fame.evaluation import start_timer, elapsed_seconds
 
 from .llm_ollama_http import OllamaHTTP, assert_ollama_running
 from .prompt_utils import build_ss_nonrag_prompt, save_modified_prompt
@@ -147,15 +148,17 @@ No vector database or retrieval step is used.
     model_name = getattr(llm, "model", "unknown")
     print(f"⏳ SS Non RAG: Running the LLM ({model_name})... this may take a while, please wait....")
 
+    t0 = start_timer()
     if llm_client is None:
         fm_xml = llm.generate(prompt, temperature=0.2)
     else:
         fm_xml = llm.generate(prompt)
+    llm_duration = elapsed_seconds(t0)
 
     # Save artifacts
     ts = time.strftime("%Y-%m-%dT%H-%M-%S")
     model_safe = re.sub(r"[^a-zA-Z0-9]+", "-", str(model_name)).strip("-").lower()
-    run_id = f"nonrag_response_{model_safe}_{ts}"
+    run_id = f"ss_nonrag_response_{model_safe}_{ts}"
 
     context_file = paths.non_ss_context / f"{run_id}.context.txt"
     prompt_file = paths.non_ss_runs / f"{run_id}.prompt.txt"
@@ -178,6 +181,7 @@ No vector database or retrieval step is used.
         "context_chars": len(context),
         "llm_host": getattr(llm, "host", ""),
         "llm_model": model_name,
+        "llm_duration_seconds": llm_duration,
         "chunks_files": [str(p) for p in files],
     }
     meta_file.write_text(json.dumps(meta, indent=2), encoding="utf-8")
