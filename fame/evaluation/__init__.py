@@ -1,4 +1,5 @@
 from .context_stats import ContextStats, analyze_context_usage, analyze_prompt_usage, estimate_tokens, extract_prompt_sources
+from .duration import start_timer, elapsed_seconds
 
 __all__ = [
     "ContextStats",
@@ -6,4 +7,6 @@ __all__ = [
     "analyze_prompt_usage",
     "estimate_tokens",
     "extract_prompt_sources",
+    "start_timer",
+    "elapsed_seconds",
 ]
