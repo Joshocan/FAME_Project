@@ -109,6 +109,18 @@ def main() -> None:
         iter_prompt_path=cfg_default.iter_prompt_path,
     )
 
+    model_name = getattr(llm_client, "model", None) or os.getenv("OLLAMA_LLM_MODEL", "ollama-default")
+    print("\n==================== IS-NONRAG ====================")
+    print(f"Root feature   : {cfg.root_feature}")
+    print(f"Domain         : {cfg.domain}")
+    print(f"Model          : {model_name}")
+    print(f"Chunks dir     : {chunks_dir or '(default)'}")
+    print(f"Max delta chars: {cfg.max_delta_chars}")
+    print(f"Max delta chunks: {cfg.max_delta_chunks}")
+    print("---------------------------------------------------")
+    print("Stage 1: Build configuration")
+    print("Stage 2: Run IS-NonRAG pipeline (iterative; may take a while)...")
+
     out = run_is_nonrag(cfg, llm=llm_client)
     print("\n✅ IS-NonRAG completed")
     print(out)
