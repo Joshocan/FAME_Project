@@ -10,6 +10,7 @@ from fame.judge import create_judge_client
 from fame.nonrag.is_pipeline import ISNonRagConfig, run_is_nonrag
 from fame.nonrag.cli_utils import prompt_choice, load_key_file, default_high_level_features
 from fame.exceptions import MissingKeyError, UserMessageError, format_error
+from fame.loggers import get_logger, log_exception
 
 
 def main() -> None:
@@ -114,9 +115,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    logger = get_logger("is_nonrag")
     try:
         main()
     except UserMessageError as e:
         print(f"❌ {format_error(e)}")
+        log_exception(logger, e)
     except Exception as e:
+        log_exception(logger, e)
         raise

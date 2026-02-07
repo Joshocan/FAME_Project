@@ -9,6 +9,7 @@ from typing import Dict, Optional, Tuple
 from fame.judge import create_judge_client
 from fame.config.load import load_config
 from fame.exceptions import MissingKeyError, UserMessageError, format_error
+from fame.loggers import get_logger, log_exception
 from fame.nonrag.ss_pipeline import SSNonRagConfig, run_ss_nonrag
 from fame.nonrag.cli_utils import prompt_choice, load_key_file, default_high_level_features
 
@@ -133,9 +134,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    logger = get_logger("ss_nonrag")
     try:
         main()
     except UserMessageError as e:
         print(f"❌ {format_error(e)}")
+        log_exception(logger, e)
     except Exception as e:
+        log_exception(logger, e)
         raise
