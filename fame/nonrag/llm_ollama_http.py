@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
 import requests
-from fame.exceptions import LLMTimeoutError
+from fame.exceptions import LLMTimeoutError, LLMHTTPError, format_error
 
 
 @dataclass
@@ -68,7 +68,17 @@ class OllamaHTTP:
             r = requests.post(url, json=payload, headers=headers, timeout=self.timeout_s)
         except requests.exceptions.ReadTimeout:
             raise LLMTimeoutError(self.host, self.model, self.timeout_s)
-        r.raise_for_status()
+        except requests.exceptions.RequestException as e:  # connection errors, etc.
+            raise LLMHTTPError(self.host, self.model, -1, detail=str(e))
+
+        if not r.ok:
+            detail = ""
+            try:
+                detail = r.json().get("error", "")
+            except Exception:
+                detail = r.text
+            raise LLMHTTPError(self.host, self.model, r.status_code, detail)
+
         data = r.json()
         out = data.get("response", "")
         return (out or "").strip()
