@@ -135,6 +135,7 @@ class OutputsCfg:
 class LoggingCfg:
     level: str
     to_file: bool
+    json: bool
 
 
 @dataclass(frozen=True)
@@ -309,6 +310,7 @@ def parse_config(doc: Dict[str, Any], repo_root: Path) -> FameConfig:
     logging_cfg = LoggingCfg(
         level=str(log.get("level", "INFO")).upper(),
         to_file=bool(log.get("to_file", False)),
+        json=bool(log.get("json", True)),
     )
 
     return FameConfig(
