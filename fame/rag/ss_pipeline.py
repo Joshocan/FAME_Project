@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Sequence
 
 from fame.utils.dirs import build_paths, ensure_for_stage, ensure_dir
 from fame.ingestion.pipeline import ingest_and_prepare
-from fame.vectorization.pipeline import vectorize_from_chunks_dir
+from fame.vectorization.pipeline import index_all_chunks
 from fame.retrieval.service import RetrievalService
 from fame.nonrag.llm_ollama_http import OllamaHTTP, assert_ollama_running
 from fame.nonrag.prompt_utils import save_modified_prompt
@@ -128,12 +128,12 @@ def run_ss_rgfm(
 
     vec_out = None
     if not skip_vectorize:
-        vec_out = vectorize_from_chunks_dir(
+        if cfg.collection_mode == "one_collection":
+            logger.warning("collection_mode=one_collection not fully supported; using per_source collections instead.")
+        vec_out = index_all_chunks(
             chunks_dir=chunks_dir,
-            collection_mode=cfg.collection_mode,
-            one_collection_name=cfg.one_collection_name,
-            collection_prefix=cfg.collection_prefix,
             batch_size=cfg.batch_size,
+            collection_prefix=cfg.collection_prefix,
         )
 
     # Determine collections
