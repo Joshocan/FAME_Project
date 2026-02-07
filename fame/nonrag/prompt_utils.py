@@ -5,6 +5,7 @@ from typing import Optional, TYPE_CHECKING, Dict
 
 from fame.utils.dirs import FamePaths, ensure_dir
 from .prompting import load_ss_nonrag_prompt, render_ss_nonrag_prompt, serialize_high_level_features
+from fame.utils.placeholder_check import assert_no_placeholders
 
 if TYPE_CHECKING:
     from .ss_pipeline import SSNonRagConfig
