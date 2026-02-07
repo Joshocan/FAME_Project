@@ -9,6 +9,7 @@ from fame.config.load import load_config
 from fame.rag.ss_pipeline import SSRGFMConfig, run_ss_rgfm
 from fame.loggers import get_logger, log_exception
 from fame.exceptions import UserMessageError, format_error
+from fame.nonrag.cli_utils import prompt_choice, load_key_file
 
 
 def main() -> None:
@@ -16,8 +17,8 @@ def main() -> None:
     p_cfg = cfg_yaml.pipelines.ss_nonrag  # reuse defaults where sensible
 
     ap = argparse.ArgumentParser(description="Run Single-Stage RAG Generated Feature Modeling (SS-RGFM)")
-    ap.add_argument("--root-feature", required=True)
-    ap.add_argument("--domain", required=True)
+    ap.add_argument("--root-feature", default="")
+    ap.add_argument("--domain", default="")
     ap.add_argument("--chunks-dir", default="", help="Directory containing *.chunks.json (default: processed_data/chunks)")
     ap.add_argument("--temperature", type=float, default=0.2)
     ap.add_argument("--prompt-path", default="", help="Custom prompt template path")
@@ -29,7 +30,33 @@ def main() -> None:
     ap.add_argument("--one-collection-name", default="fame_all")
     ap.add_argument("--collection-prefix", default="")
     ap.add_argument("--batch-size", type=int, default=24)
+    ap.add_argument("--interactive", action="store_true", help="Run with guided prompts")
     args = ap.parse_args()
+
+    interactive = args.interactive or not (args.root_feature and args.domain)
+
+    if interactive:
+        model = prompt_choice(
+            "Select Open Source LLM model",
+            ("gpt-oss:120b-cloud", "glm-4.7:cloud", "deepseek-v3.2:cloud"),
+        )
+        os.environ["OLLAMA_LLM_MODEL"] = model
+
+        key_path = Path("api_keys/ollama_key.txt")
+        key = load_key_file(key_path)
+        if key:
+            os.environ["OLLAMA_API_KEY_FILE"] = str(key_path)
+            os.environ.setdefault("OLLAMA_LLM_HOST", "https://ollama.com")
+        else:
+            print("⚠️  ollama_key not found. Using local Ollama for LLM.")
+            os.environ.setdefault("OLLAMA_LLM_HOST", "http://127.0.0.1:11434")
+
+        os.environ.setdefault("OLLAMA_EMBED_HOST", "http://127.0.0.1:11434")
+
+        domain = input("Enter domain [Model Driven Engineering]: ").strip() or "Model Driven Engineering"
+        root_feature = input("Enter root feature [Model Federation]: ").strip() or "Model Federation"
+        args.domain = domain
+        args.root_feature = root_feature
 
     chunks_dir = Path(args.chunks_dir).expanduser().resolve() if args.chunks_dir else None
     prompt_path = Path(args.prompt_path).expanduser() if args.prompt_path else None
