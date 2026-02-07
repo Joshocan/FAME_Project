@@ -32,6 +32,7 @@ class FamePaths:
     ss_fm: Path
     ms_fm: Path
     modified_prompts: Path
+    logs: Path
 
     # non-rag umbrella (generated) - kept for compatibility/convenience
     non_root: Path
@@ -125,6 +126,7 @@ def build_paths(base_dir: Optional[Path] = None) -> FamePaths:
         ss_fm=results / "rag" / "ss-rgfm" / "fm",
         ms_fm=results / "rag" / "ms-rgfm" / "fm",
         modified_prompts=results / "modified_prompts",
+        logs=results / "logs",
 
         # non-rag umbrella (generated) - kept for compatibility
         non_root=non_root,
@@ -207,6 +209,9 @@ def ensure_for_stage(stage: str, p: FamePaths) -> Dict[str, Path]:
         mk("PROMPTS", p.prompts)
         mk("SPECIFICATIONS", p.specifications)
 
+    elif stage in ("logs", "log"):
+        mk("LOGS", p.logs)
+
     elif stage in ("notebooks",):
         mk("NOTEBOOKS", p.notebooks)
 
@@ -253,12 +258,14 @@ def ensure_for_stage(stage: str, p: FamePaths) -> Dict[str, Path]:
         mk("NON_SS_CONTEXT", p.non_ss_context)
         mk("NON_SS_REPORTS", p.non_ss_reports)
         mk("NON_SS_RUNS", p.non_ss_runs)
+        mk("LOGS", p.logs)
 
     elif stage in ("is-nonrag", "is_nonrag", "is-non-rag", "iter-nonrag", "iter_nonrag"):
         mk("NON_IS_FM", p.non_is_fm)
         mk("NON_IS_CONTEXT", p.non_is_context)
         mk("NON_IS_REPORTS", p.non_is_reports)
         mk("NON_IS_RUNS", p.non_is_runs)
+        mk("LOGS", p.logs)
 
     elif stage in ("validate",):
         mk("VALIDATION", p.validation)
