@@ -199,11 +199,11 @@ refined. No retrieval or vector DB is used.
             "PREVIOUS_FM_XML": (previous_xml.strip() or "(empty)"),
             "delta_context": delta_context,
             "DELTA_CONTEXT": delta_context,
+            "CONTEXT": delta_context,
             "HIGH_LEVEL_FEATURES": high_level_xml,
             "MAX_DEPTH": str(cfg.max_depth) if cfg.max_depth is not None else "",
             "XSD_METAMODEL": xsd_text,
             "FEATURE_METAMODEL": metamodel_text,
-            "INPUT_TEXT": delta_context,
             "inputfile": "",
             "mmdir": "",
         }

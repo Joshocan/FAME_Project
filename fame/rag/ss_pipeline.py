@@ -8,14 +8,16 @@ from typing import Dict, List, Optional, Sequence
 
 from fame.utils.dirs import build_paths, ensure_for_stage, ensure_dir
 from fame.ingestion.pipeline import ingest_and_prepare
-from fame.vectorization.pipeline import index_all_chunks
+from fame.vectorization.pipeline import index_all_chunks, default_collection_name
 from fame.retrieval.service import RetrievalService
 from fame.nonrag.llm_ollama_http import OllamaHTTP, assert_ollama_running
 from fame.nonrag.prompt_utils import save_modified_prompt
-from fame.utils.placeholder_check import assert_no_placeholders
+from fame.nonrag.prompting import render_prompt_template, serialize_high_level_features
 from fame.evaluation import start_timer, elapsed_seconds
 from fame.exceptions import MissingChunksError
 from fame.loggers import get_logger
+import json as _json
+from fame.vectorization.chroma_health import assert_chroma_running
 
 
 @dataclass(frozen=True)
@@ -41,6 +43,9 @@ class SSRGFMConfig:
 
     # prompt + generation
     prompt_path: Optional[Path] = None
+    xsd_path: Optional[Path] = None
+    feature_metamodel_path: Optional[Path] = None
+    high_level_features: Optional[Dict[str, str]] = None
     temperature: float = 0.2
 
     # output naming
@@ -55,36 +60,31 @@ def _list_chunks_files(chunks_dir: Path) -> List[Path]:
     return sorted(chunks_dir.glob("*.chunks.json"))
 
 
+def _count_total_chunks(files: Sequence[Path]) -> int:
+    total = 0
+    for f in files:
+        try:
+            payload = _json.loads(f.read_text(encoding="utf-8"))
+            chunks = payload.get("chunks") or payload.get("data") or []
+            total += len(chunks)
+        except Exception:
+            continue
+    return total
+
+
 def _collection_name_for_file(fp: Path, prefix: str = "") -> str:
-    # paper.pdf.chunks.json -> paper_pdf (safe-ish)
-    stem = fp.stem.replace(".chunks", "").replace(".", "_").replace("-", "_")
-    return f"{prefix}{stem}" if prefix else stem
+    base = default_collection_name(fp)
+    return f"{prefix}{base}" if prefix else base
 
 
-def load_ss_rgfm_prompt(prompt_path: Optional[Path] = None) -> str:
+def load_ss_rgfm_prompt(prompt_path: Optional[Path], base_dir: Path) -> str:
     """
-    Load prompt template for SS-RGFM. Falls back to a minimal built-in template.
+    Load prompt template for SS-RGFM. Defaults to prompts/fm_extraction_prompt.txt.
     """
-    if prompt_path:
-        p = Path(prompt_path).expanduser()
-        if p.exists():
-            return p.read_text(encoding="utf-8")
-    return (
-        "You are an expert in Feature Modeling. Given the domain \"{{DOMAIN}}\" and "
-        "root feature \"{{ROOT_FEATURE}}\", produce a FeatureIDE-compatible XML "
-        "feature model using the EVIDENCE below.\n\n"
-        "EVIDENCE:\n{{EVIDENCE}}\n"
-    )
-
-
-def render_ss_rgfm_prompt(*, root_feature: str, domain: str, evidence: str, prompt_template: str) -> str:
-    prompt = (
-        prompt_template.replace("{{ROOT_FEATURE}}", root_feature)
-        .replace("{{DOMAIN}}", domain)
-        .replace("{{EVIDENCE}}", evidence)
-    )
-    assert_no_placeholders(prompt)
-    return prompt
+    candidate = Path(prompt_path).expanduser() if prompt_path else (base_dir / "prompts" / "fm_extraction_prompt.txt")
+    if candidate.exists():
+        return candidate.read_text(encoding="utf-8")
+    raise FileNotFoundError(f"Prompt template not found: {candidate}")
 
 
 def run_ss_rgfm(
@@ -113,6 +113,9 @@ def run_ss_rgfm(
     if llm is None:
         assert_ollama_running()
         llm = OllamaHTTP()
+
+    # Ensure Chroma is reachable before vectorization/retrieval
+    assert_chroma_running()
 
     # Ensure chunks exist
     chunks_dir = cfg.chunks_dir or _default_chunks_dir(paths)
@@ -143,12 +146,16 @@ def run_ss_rgfm(
         collections = [_collection_name_for_file(f, prefix=cfg.collection_prefix) for f in files]
 
     retr = retriever or RetrievalService()
+    total_chunks = _count_total_chunks(files)
+    auto_k = max(1, total_chunks // 2) if total_chunks else cfg.n_results_per_collection
+    max_total_results = max(1, min(cfg.max_total_results, auto_k * len(collections))) if total_chunks else cfg.max_total_results
+
     res = retr.retrieve(
         root_feature=cfg.root_feature,
         domain=cfg.domain,
         collections=collections,
-        n_results_per_collection=cfg.n_results_per_collection,
-        max_total_results=cfg.max_total_results,
+        n_results_per_collection=auto_k,
+        max_total_results=max_total_results,
     )
     evidence = retr.to_prompt_evidence(
         res,
@@ -156,12 +163,26 @@ def run_ss_rgfm(
         max_chunk_chars=cfg.max_chunk_chars,
     )
 
-    tmpl = load_ss_rgfm_prompt(cfg.prompt_path)
-    prompt = render_ss_rgfm_prompt(
-        root_feature=cfg.root_feature,
-        domain=cfg.domain,
-        evidence=evidence,
-        prompt_template=tmpl,
+    tmpl = load_ss_rgfm_prompt(cfg.prompt_path, paths.base_dir)
+    spec_dir = paths.specifications
+    xsd_path = cfg.xsd_path or (spec_dir / "feature_model_schema.xsd")
+    metamodel_path = cfg.feature_metamodel_path or (spec_dir / "feature_metamodel_specification.txt")
+
+    xsd_text = xsd_path.read_text(encoding="utf-8") if xsd_path.exists() else ""
+    metamodel_text = metamodel_path.read_text(encoding="utf-8") if metamodel_path.exists() else ""
+    high_level_xml = serialize_high_level_features(cfg.high_level_features)
+
+    prompt = render_prompt_template(
+        tmpl,
+        values={
+            "ROOT_FEATURE": cfg.root_feature,
+            "DOMAIN": cfg.domain,
+            "CONTEXT": evidence,
+            "XSD_METAMODEL": xsd_text,
+            "FEATURE_METAMODEL": metamodel_text,
+            "HIGH_LEVEL_FEATURES": high_level_xml,
+        },
+        strict=True,
     )
 
     t0 = start_timer()

@@ -6,8 +6,11 @@ from typing import Dict, Optional
 
 
 DEFAULT_RAG_QUERY_TEMPLATE = """({{ROOT_FEATURE}} AND {{DOMAIN}})
-AND (approach OR methodology OR method OR framework OR architecture OR implementation OR design OR pipeline OR workflow OR algorithm OR technique OR system OR tool OR platform OR infrastructure)
-AND (propose OR present OR introduce OR describe OR implement OR develop OR build OR realize OR evaluate OR validate OR experiment OR case study OR study)"""
+AND (
+  approach OR methodology OR method OR framework OR architecture OR design
+  OR implementation OR pipeline OR workflow OR algorithm OR technique
+  OR system OR tool OR platform OR infrastructure
+)"""
 
 
 @dataclass(frozen=True)

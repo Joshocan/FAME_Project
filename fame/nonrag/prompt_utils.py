@@ -37,7 +37,7 @@ def build_ss_nonrag_prompt(
         context=context,
         prompt_template=tmpl,
         extra_placeholders={
-            "INPUT_TEXT": context,
+            "CONTEXT": context,
             "XSD_METAMODEL": xsd_text,
             "FEATURE_METAMODEL": metamodel_text,
             "HIGH_LEVEL_FEATURES": high_level_xml,
