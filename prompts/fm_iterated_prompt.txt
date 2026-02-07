@@ -4,7 +4,7 @@ You specialize in incremental model evolution. Your job is to REFINE an existing
 using new evidence from the next INPUT_TEXT, not to concatenate or “dump” everything.
 
 GOAL:
-Given (1) the PREVIOUS FEATURE MODEL in FeatureIDE-like XML and (2) NEW INPUT_TEXT, produce ONE UPDATED feature model:
+Given (1) the PREVIOUS FEATURE MODEL in FeatureIDE-like XML and (2) NEW CONTEXT, produce ONE UPDATED feature model:
 - rooted at {{ROOT_FEATURE}}
 - compatible with FeatureIDE / {{XSD_METAMODEL}}
 - with deep, meaningful hierarchy
@@ -13,12 +13,38 @@ Given (1) the PREVIOUS FEATURE MODEL in FeatureIDE-like XML and (2) NEW INPUT_TE
 STRICT OUTPUT CONTRACT:
 - Output ONLY the XML (no markdown, no code fences, no commentary).
 - Use the root feature name EXACTLY as: {{ROOT_FEATURE}}
-- The UPDATED XML MUST be well-formed and MUST validate against: {{XSD_METAMODEL}}.
+ - The UPDATED XML MUST be well-formed and MUST validate against: {{XSD_METAMODEL}}. There must be **no text before the opening `<?xml ...?>`** and **no text after the closing `</featureModel>`**.
 - Maintain the  {{HIGH_LEVEL_FEATURES}} as the first level of abstract features after the {{ROOT_FEATURE}}
 - Include exactly one <description> element (at least one full sentence) for EVERY feature or group node.
-- Do NOT invent features or constraints; only use evidence from PREVIOUS_FM_XML and NEW INPUT_TEXT.
+- Do NOT invent features or constraints; only use evidence from PREVIOUS_FM_XML and NEW CONTEXT.
 - deeper and better organized (when evidence supports it)
 - Feature name convention (FeatureIDE-compatible): feature names must be identifiers (start with a letter/underscore; then letters/digits/underscore/hyphen only). NO spaces or other punctuation. Replace spaces with underscores or hyphens.
+
+TRACEABILITY & SEMANTIC VALIDATION RULES (CRITICAL):
+- Every feature MUST include exactly ONE <description> element (≥ 1 full sentence).
+- The <description> MUST be grounded in the CONTEXT (PREVIOUS_FM_XML + NEW INPUT TEXT).
+
+TRACE FORMAT (MANDATORY FOR CONCRETE FEATURES):
+- For EVERY concrete feature, append a traceability suffix at the END of the description using EXACTLY this format:
+  "Trace: [<ref1>; <ref2>; ...]"
+- Each ref MUST identify an article/document ID and a section/heading, e.g.:
+  "Article_3 §4.2 Architecture"
+  "Article_5 §Heading: Implementation"
+- Use semicolon ';' to separate multiple refs.
+- The Trace block MUST contain at least ONE ref for concrete features.
+- For abstract features, Trace is OPTIONAL and may be omitted or may summarize children.
+    - Abstract features are justified if all descendant concrete features are evidence-grounded.
+
+EXAMPLE:
+<description>
+  Supports OAuth 2.0 authentication for secure access. Trace: [Article_3 §4.2 Architecture; Article_3 §5 Implementation]
+</description>
+
+FINAL SELF-CHECK (SILENT, MUST PERFORM):
+- Every feature has exactly ONE <description>.
+- Every concrete feature description ends with "Trace: [ ... ]" and contains ≥ 1 reference.
+- All references used in Trace appear in the CONTEXT metadata (article IDs / headings).
+- XML validates against XSD METAMODEL.
 
 INCREMENTAL REFINEMENT RULES (CRITICAL):
 1) Preserve first, then refine:
@@ -26,7 +52,7 @@ INCREMENTAL REFINEMENT RULES (CRITICAL):
    - Only remove a feature if it is clearly wrong or contradictory (rare); prefer re-parenting instead of deletion.
 
 2) Add only what is new:
-   - From NEW INPUT_TEXT, extract ONLY features/constraints that are missing from PREVIOUS_FM_XML.
+   - From NEW CONTEXT, extract ONLY features/constraints that are missing from PREVIOUS_FM_XML.
    - Do NOT duplicate features already present (avoid near-duplicates; normalize names consistently).
 
 3) Restructure for clarity (allowed, but controlled):
@@ -44,14 +70,14 @@ INCREMENTAL REFINEMENT RULES (CRITICAL):
    - If a concept does not fit, create an additional abstract branch ONLY if necessary and justified by evidence.
 
 6) Variability semantics:
-   - mandatory="true" ONLY when NEW INPUT_TEXT explicitly indicates “must/required/mandatory”.
+   - mandatory="true" ONLY when NEW CONTEXT explicitly indicates “must/required/mandatory”.
    - Otherwise omit mandatory.
    - Use group operators:
      <and> for co-existing decomposition,
      <or> for one-or-more choices,
      <alt> for exactly-one choices (only if explicitly indicated).
 
-7) Constraints (only if explicit in NEW INPUT_TEXT):
+7) Constraints (only if explicit in NEW CONTEXT):
    - Requires(A,B): <rule><imp><var>A</var><var>B</var></imp></rule>
    - Excludes(A,B): <rule><and><var>A</var><not><var>B</var></not></and></rule>
    - Only add constraints that are directly stated or unambiguous.
@@ -59,11 +85,11 @@ INCREMENTAL REFINEMENT RULES (CRITICAL):
 8) Description maintenance:
    - Keep good existing descriptions from PREVIOUS_FM_XML.
    - If you move a node, update its description if needed to remain accurate.
-   - Any NEW node must have a description grounded in NEW INPUT_TEXT.
+   - Any NEW node must have a description grounded in NEW CONTEXT.
 
 PROCESS (THINK SILENTLY; OUTPUT ONLY XML):
 Step A: Parse PREVIOUS_FM_XML mentally; build an internal list of existing feature names and their hierarchy.
-Step B: Extract candidate features/constraints from NEW INPUT_TEXT (with preferred abstraction levels).
+Step B: Extract candidate features/constraints from NEW CONTEXT (with preferred abstraction levels).
 Step C: Compute a delta: what is missing vs already present.
 Step D: Integrate the delta by:
         - inserting under the best existing abstract node, OR
@@ -88,7 +114,7 @@ PREVIOUS FEATURE MODEL (XML TO REFINE):
 
 NEW INPUT TEXT (NEXT EVIDENCE):
 ---
-{{INPUT_TEXT}}
+{{CONTEXT}}
 ---
 
 TASK:

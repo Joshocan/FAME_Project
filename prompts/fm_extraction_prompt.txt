@@ -4,7 +4,7 @@ You specialize in domain analysis, variability modeling, and extracting feature 
 Your job is to produce a rich, multi-level feature hierarchy that is faithful to the article.
 
 USER INSTRUCTION:
-Analyze the scientific article in INPUT_TEXT and extract a Feature Model that captures the proposed Model Federation approach.
+Analyze the scientific article in CONTEXT and extract a Feature Model that captures the proposed Model Federation approach.
 
 MANDATORY EXTRACTION RULES (FOLLOW STRICTLY)
 
@@ -36,15 +36,41 @@ D) Variability modeling rules
 E) Evidence and fidelity
 10) Use terminology from the paper as feature names where possible.
 11) Do not omit details because they seem “too specific” if they appear as concepts/examples in the paper.
-12) Use ONLY features and constraints evidenced in the INPUT_TEXT. Do NOT invent.
+12) Use ONLY features and constraints evidenced in the CONTEXT. Do NOT invent.
 
 OUTPUT REQUIREMENTS (STRICT)
 13) Produce a single FeatureIDE-compatible XML feature model.
 14) Output ONLY the XML. No markdown, no explanations, no commentary.
-15) The XML MUST be well-formed and MUST validate against: XSD METAMODEL below
+15) The XML MUST be well-formed and MUST validate against: XSD METAMODEL below. There must be **no text before the opening `<?xml ...?>`** and **no text after the closing `</featureModel>`**.
 16) Every feature/group node MUST include exactly one <description> element with at least one full sentence explaining its role.
 17) Use mandatory="true" ONLY when the text clearly indicates “must/required/mandatory”; otherwise omit it.
 18) Feature name convention (FeatureIDE-compatible): feature names must be identifiers (start with a letter/underscore; then letters/digits/underscore/hyphen only). NO spaces or other punctuation. Replace spaces with underscores or hyphens.
+
+TRACEABILITY & SEMANTIC VALIDATION RULES (CRITICAL):
+- Every feature MUST include exactly ONE <description> element (≥ 1 full sentence).
+- The <description> MUST be grounded in the CONTEXT.
+
+TRACE FORMAT (MANDATORY FOR CONCRETE FEATURES):
+- For EVERY concrete feature, append a traceability suffix at the END of the description using EXACTLY this format:
+  "Trace: [<ref1>; <ref2>; ...]"
+- Each ref MUST identify an article/document ID and a section/heading, e.g.:
+  "Article_3 §4.2 Architecture"
+  "Article_5 §Heading: Implementation"
+- Use semicolon ';' to separate multiple refs.
+- The Trace block MUST contain at least ONE ref for concrete features.
+- For abstract features, Trace is OPTIONAL and may be omitted or may summarize children.
+    - Abstract features are justified if all descendant concrete features are evidence-grounded.
+
+EXAMPLE:
+<description>
+  Supports OAuth 2.0 authentication for secure access. Trace: [Article_3 §4.2 Architecture; Article_3 §5 Implementation]
+</description>
+
+FINAL SELF-CHECK (SILENT, MUST PERFORM):
+- Every feature has exactly ONE <description>.
+- Every concrete feature description ends with "Trace: [ ... ]" and contains ≥ 1 reference.
+- All references used in Trace appear in the CONTEXT metadata (article IDs / headings).
+- XML validates against XSD METAMODEL.
 
 REFERENCE SPECIFICATION (USE AS SPECIFICATION; DO NOT ECHO VERBATIM):
 ---
@@ -56,9 +82,9 @@ XSD METAMODEL (VALIDATION CONTRACT):
 {{XSD_METAMODEL}}
 ---
 
-INPUT_TEXT:
+CONTEXT:
 ---
-{{INPUT_TEXT}}
+{{CONTEXT}}
 ---
 
 TASK:
