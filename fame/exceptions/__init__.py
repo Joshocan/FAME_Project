@@ -1,4 +1,4 @@
-from .llm_errors import LLMTimeoutError  # legacy import
+from .llm_errors import LLMTimeoutError, LLMHTTPError  # legacy import
 from .user_messages import (
     UserMessageError,
     PlaceholderError,
@@ -9,6 +9,7 @@ from .user_messages import (
 
 __all__ = [
     "LLMTimeoutError",
+    "LLMHTTPError",
     "UserMessageError",
     "PlaceholderError",
     "MissingKeyError",
