@@ -133,4 +133,5 @@ outputs:
 logging:
   level: "INFO"
   # If set, logs can also be written to a file under results/
-  to_file: false
+  to_file: true
+  json: true
