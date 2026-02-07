@@ -8,8 +8,9 @@ from pathlib import Path
 from fame.config.load import load_config
 from fame.rag.ss_pipeline import SSRGFMConfig, run_ss_rgfm
 from fame.loggers import get_logger, log_exception
-from fame.exceptions import UserMessageError, format_error
-from fame.nonrag.cli_utils import prompt_choice, load_key_file
+from fame.exceptions import UserMessageError, MissingKeyError, format_error
+from fame.nonrag.cli_utils import prompt_choice, load_key_file, default_high_level_features
+from fame.judge import create_judge_client
 
 
 def main() -> None:
@@ -35,28 +36,70 @@ def main() -> None:
 
     interactive = args.interactive or not (args.root_feature and args.domain)
 
+    llm_client = None
+    high_level_features = None
+
     if interactive:
-        model = prompt_choice(
-            "Select Open Source LLM model",
-            ("gpt-oss:120b-cloud", "glm-4.7:cloud", "deepseek-v3.2:cloud"),
-        )
-        os.environ["OLLAMA_LLM_MODEL"] = model
+        mode = prompt_choice("1) Open Source LLM  OR Judge LLM", ("Open Source LLM", "Judge LLM"))
 
-        key_path = Path("api_keys/ollama_key.txt")
-        key = load_key_file(key_path)
-        if key:
-            os.environ["OLLAMA_API_KEY_FILE"] = str(key_path)
-            os.environ.setdefault("OLLAMA_LLM_HOST", "https://ollama.com")
+        if mode == "Open Source LLM":
+            model = prompt_choice(
+                "Select Open Source LLM model",
+                ("gpt-oss:120b-cloud", "glm-4.7:cloud", "deepseek-v3.2:cloud"),
+            )
+            os.environ["OLLAMA_LLM_MODEL"] = model
+
+            key_path = Path("api_keys/ollama_key.txt")
+            key = load_key_file(key_path)
+            if key:
+                os.environ["OLLAMA_API_KEY_FILE"] = str(key_path)
+                os.environ.setdefault("OLLAMA_LLM_HOST", "https://ollama.com")
+            else:
+                print("⚠️  ollama_key not found. Using local Ollama for LLM.")
+                os.environ.setdefault("OLLAMA_LLM_HOST", "http://127.0.0.1:11434")
+
+            os.environ.setdefault("OLLAMA_EMBED_HOST", "http://127.0.0.1:11434")
         else:
-            print("⚠️  ollama_key not found. Using local Ollama for LLM.")
-            os.environ.setdefault("OLLAMA_LLM_HOST", "http://127.0.0.1:11434")
+            model = prompt_choice(
+                "Select Judge LLM model",
+                ("gpt-5", "claude-opus", "gemini-3"),
+            )
+            provider_map = {
+                "gpt-5": ("openai", "OPENAI_API_KEY", Path("api_keys/openai_key.txt")),
+                "claude-opus": ("anthropic", "ANTHROPIC_API_KEY", Path("api_keys/anthropic_key.txt")),
+                "gemini-3": ("gemini", "GEMINI_API_KEY", Path("api_keys/gemini_key.txt")),
+            }
+            provider, env_var, key_file = provider_map[model]
+            key = load_key_file(key_file)
+            if not key:
+                raise MissingKeyError(env_var, str(key_file))
+            os.environ[env_var] = key
 
-        os.environ.setdefault("OLLAMA_EMBED_HOST", "http://127.0.0.1:11434")
+            judge_cfg = load_config().llm_judge
+            llm_client = create_judge_client(
+                provider=provider,
+                model=model,
+                base_url=judge_cfg.base_url,
+                api_key_env=env_var,
+                temperature=judge_cfg.temperature,
+                max_tokens=judge_cfg.max_tokens,
+                timeout_s=judge_cfg.timeout_s,
+            )
 
         domain = input("Enter domain [Model Driven Engineering]: ").strip() or "Model Driven Engineering"
         root_feature = input("Enter root feature [Model Federation]: ").strip() or "Model Federation"
         args.domain = domain
         args.root_feature = root_feature
+
+        hl = input("Include high-level features? (y/N): ").strip().lower()
+        if hl in ("y", "yes"):
+            feats = default_high_level_features()
+            print("\nHigh-level features:")
+            for k, v in feats.items():
+                print(f"- {k}: {v}")
+            confirm = input("Use these? (Y/n): ").strip().lower()
+            if confirm in ("", "y", "yes", ""):
+                high_level_features = feats
 
     chunks_dir = Path(args.chunks_dir).expanduser().resolve() if args.chunks_dir else None
     prompt_path = Path(args.prompt_path).expanduser() if args.prompt_path else None
@@ -76,9 +119,28 @@ def main() -> None:
         max_chunk_chars=args.max_chunk_chars,
         prompt_path=prompt_path,
         temperature=args.temperature,
+        high_level_features=high_level_features,
     )
 
-    out = run_ss_rgfm(cfg)
+    print("\n==================== SS-RGFM ====================")
+    print(f"Root feature   : {cfg.root_feature}")
+    print(f"Domain         : {cfg.domain}")
+    print(f"Model          : {(getattr(llm_client, 'model', None) or os.getenv('OLLAMA_LLM_MODEL', 'ollama-default'))}")
+    chroma_mode = os.getenv("CHROMA_MODE", "persistent").lower()
+    if chroma_mode == "http":
+        chroma_host = os.getenv("CHROMA_HOST", "127.0.0.1")
+        chroma_port = os.getenv("CHROMA_PORT", "8000")
+        chroma_info = f"http://{chroma_host}:{chroma_port}"
+    else:
+        chroma_path = os.getenv("CHROMA_PATH", "data/chroma_db")
+        chroma_info = f"persistent @ {chroma_path}"
+    print(f"Chunk server   : Chroma ({chroma_info}) [collections from {chunks_dir or 'default processed_data/chunks'}]")
+    print("-------------------------------------------------")
+    print("Stage 1: Build configuration")
+    print(f"Stage 2: Run SS-RGFM pipeline (may take a while)...")
+
+    out = run_ss_rgfm(cfg, llm=llm_client)
+
     print("✅ SS-RGFM completed")
     for k, v in out.items():
         print(f"{k}: {v}")
