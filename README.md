@@ -16,7 +16,21 @@ Runs optional preprocessing, then lets you pick RAG / Non‑RAG and SS / IS vari
 PYTHONPATH=$(pwd) .venv/bin/python scripts/run_fame.py
 ```
 
-## 3) Run individual steps
+## 3) Evaluation helpers
+- Coverage (semantic recall vs ground truth):
+  ```bash
+  PYTHONPATH=$(pwd) .venv/bin/python scripts/coverage_fm.py \
+    --gt data/ground_truth/federation.xml \
+    --pred results/rag/ss-rgfm/fm/your_model.xml
+  ```
+- Well-formedness/XSD check:
+  ```bash
+  PYTHONPATH=$(pwd) .venv/bin/python scripts/check_wellformed.py \
+    --xml results/rag/ss-rgfm/fm/your_model.xml \
+    --xsd prompts/specifications/feature_model_featureide.xsd
+  ```
+
+## 4) Run individual steps
 All commands assume the venv is active (`source .venv/bin/activate`) and `PYTHONPATH=$(pwd)`.
 
 ### Preprocessing (ingest + vectorize)
@@ -44,12 +58,12 @@ PYTHONPATH=$(pwd) .venv/bin/python scripts/run_ss_rag.py --interactive
 PYTHONPATH=$(pwd) .venv/bin/python scripts/run_is_rag.py --interactive
 ```
 
-## 4) Ollama host hints
+## 5) Ollama host hints
 - Embeddings typically run on a local Ollama host: `OLLAMA_EMBED_HOST=http://127.0.0.1:11434`.
 - LLM generation can use cloud: `OLLAMA_LLM_HOST=https://ollama.com`.
 Set these before running preprocessing/pipelines if you split hosts.
 
-## 5) Logs & outputs
+## 6) Logs & outputs
 - Results: `results/` (FM XMLs, prompts, stats, etc.)
 - Logs: `results/logs/fame.log` (structured JSON)
 
