@@ -31,6 +31,7 @@ class FamePaths:
     results: Path
     ss_fm: Path
     ms_fm: Path
+    is_fm: Path
     modified_prompts: Path
     logs: Path
 
@@ -125,6 +126,7 @@ def build_paths(base_dir: Optional[Path] = None) -> FamePaths:
         results=results,
         ss_fm=results / "rag" / "ss-rgfm" / "fm",
         ms_fm=results / "rag" / "ms-rgfm" / "fm",
+        is_fm=results / "rag" / "is-rgfm" / "fm",
         modified_prompts=results / "modified_prompts",
         logs=results / "logs",
 
@@ -233,6 +235,11 @@ def ensure_for_stage(stage: str, p: FamePaths) -> Dict[str, Path]:
 
     elif stage in ("ms-rgfm", "extract_ms"):
         mk("MS_FM", p.ms_fm)
+
+    elif stage in ("is-rgfm", "is_rgfm", "iter-rgfm"):
+        mk("IS_FM", p.is_fm)
+        mk("REPORTS", p.reports)
+        mk("IMAGES", p.images)
 
     # umbrella: create both non-rag variants + umbrella folders
     elif stage in ("non-rag", "non_rag", "nonrag"):
