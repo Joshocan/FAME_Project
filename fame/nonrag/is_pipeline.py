@@ -262,8 +262,8 @@ refined. No retrieval or vector DB is used.
         "root_feature": cfg.root_feature,
         "domain": cfg.domain,
         "num_sources": len(files),
-        "ollama_host": getattr(llm, "host", ""),
-        "ollama_model": getattr(llm, "model", ""),
+        "llm_host": getattr(llm, "host", getattr(llm, "base_url", "")),
+        "llm_model": getattr(llm, "model", ""),
         "total_llm_duration_seconds": sum(float(m.get("llm_duration_seconds", 0)) for m in iteration_meta),
         "iterations": iteration_meta,
     }

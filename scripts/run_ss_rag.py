@@ -64,10 +64,10 @@ def main() -> None:
         else:
             model = prompt_choice(
                 "Select Judge LLM model",
-                ("gpt-5", "claude-opus", "gemini-3"),
+                ("gpt-4.1", "claude-opus", "gemini-3"),
             )
             provider_map = {
-                "gpt-5": ("openai", "OPENAI_API_KEY", Path("api_keys/openai_key.txt")),
+                "gpt-4.1": ("openai", "OPENAI_API_KEY", Path("api_keys/openai_key.txt")),
                 "claude-opus": ("anthropic", "ANTHROPIC_API_KEY", Path("api_keys/anthropic_key.txt")),
                 "gemini-3": ("gemini", "GEMINI_API_KEY", Path("api_keys/gemini_key.txt")),
             }

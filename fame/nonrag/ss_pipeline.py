@@ -185,7 +185,7 @@ No vector database or retrieval step is used.
         "num_sources": len(files),
         "num_chunks_total": len(all_chunks),
         "context_chars": len(context),
-        "llm_host": getattr(llm, "host", ""),
+        "llm_host": getattr(llm, "host", getattr(llm, "base_url", "")),
         "llm_model": model_name,
         "llm_duration_seconds": llm_duration,
         "chunks_files": [str(p) for p in files],

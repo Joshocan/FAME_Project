@@ -36,7 +36,7 @@ services:
 
   llm_judge:
     provider: "openai"          # openai | gemini | anthropic
-    model: "gpt-5"
+    model: "gpt-4.1"
     # Optional: override API base URL (empty uses provider default)
     base_url: ""
     # Environment variable that holds your API key

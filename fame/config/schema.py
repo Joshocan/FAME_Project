@@ -206,7 +206,7 @@ def parse_config(doc: Dict[str, Any], repo_root: Path) -> FameConfig:
     judge = s.get("llm_judge", {})
     llm_judge_cfg = LlmJudgeCfg(
         provider=str(judge.get("provider", "openai")).lower(),
-        model=str(judge.get("model", "gpt-5")),
+        model=str(judge.get("model", "gpt-4.1")),
         base_url=str(judge.get("base_url", "")),
         api_key_env=str(judge.get("api_key_env", "JUDGE_API_KEY")),
         temperature=float(judge.get("temperature", 0.2)),
