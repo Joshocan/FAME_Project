@@ -1,12 +1,11 @@
-from .context_stats import ContextStats, analyze_context_usage, analyze_prompt_usage, estimate_tokens, extract_prompt_sources
-from .duration import start_timer, elapsed_seconds
+"""Evaluation utilities for Feature Models.
 
-__all__ = [
-    "ContextStats",
-    "analyze_context_usage",
-    "analyze_prompt_usage",
-    "estimate_tokens",
-    "extract_prompt_sources",
-    "start_timer",
-    "elapsed_seconds",
-]
+Current modules:
+ - coverage: semantic recall-style coverage of generated vs ground-truth FMs.
+
+Designed to be extended (structure, constraints, traceability, etc.).
+"""
+
+from .coverage import CoverageEvaluator, CoverageConfig, coverage_score
+
+__all__ = ["CoverageEvaluator", "CoverageConfig", "coverage_score"]
