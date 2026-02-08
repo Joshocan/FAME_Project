@@ -62,22 +62,23 @@ def main() -> None:
 
             os.environ.setdefault("OLLAMA_EMBED_HOST", "http://127.0.0.1:11434")
         else:
+            judge_cfg = cfg_yaml.llm_judge
             model = prompt_choice(
                 "Select Judge LLM model",
                 ("gpt-4.1", "claude-opus-4-5", "gemini-3-pro-preview"),
             )
             provider_map = {
-                "gpt-4.1": ("openai", "OPENAI_API_KEY", Path("api_keys/openai_key.txt")),
-                "claude-opus-4-5": ("anthropic", "ANTHROPIC_API_KEY", Path("api_keys/anthropic_key.txt")),
-                "gemini-3-pro-preview": ("gemini", "GEMINI_API_KEY", Path("api_keys/gemini_key.txt")),
+                "gpt-4.1": ("openai", "OPENAI_API_KEY"),
+                "claude-opus-4-5": ("anthropic", "ANTHROPIC_API_KEY"),
+                "gemini-3-pro-preview": ("gemini", "GEMINI_API_KEY"),
             }
-            provider, env_var, key_file = provider_map[model]
+            provider, env_var = provider_map[model]
+            key_file = judge_cfg.api_key_dir / f"{provider}_key.txt"
             key = load_key_file(key_file)
             if not key:
                 raise MissingKeyError(env_var, str(key_file))
             os.environ[env_var] = key
 
-            judge_cfg = load_config().llm_judge
             llm_client = create_judge_client(
                 provider=provider,
                 model=model,

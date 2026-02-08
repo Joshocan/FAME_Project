@@ -48,6 +48,7 @@ class LlmJudgeCfg:
     model: str
     base_url: str
     api_key_env: str
+    api_key_dir: Path
     temperature: float
     max_tokens: int
     timeout_s: int
@@ -211,6 +212,7 @@ def parse_config(doc: Dict[str, Any], repo_root: Path) -> FameConfig:
         model=str(judge.get("model", "gpt-4.1")),
         base_url=str(judge.get("base_url", "")),
         api_key_env=str(judge.get("api_key_env", "JUDGE_API_KEY")),
+        api_key_dir=_as_path(base, str(judge.get("api_key_dir", "api_keys"))),
         temperature=float(judge.get("temperature", 0.2)),
         max_tokens=int(judge.get("max_tokens", 2048)),
         timeout_s=int(judge.get("timeout_s", 120)),

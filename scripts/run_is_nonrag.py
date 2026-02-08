@@ -56,25 +56,26 @@ def main() -> None:
                 ("gpt-4.1", "claude-opus-4-5", "gemini-3-pro-preview"),
             )
             provider_map = {
-                "gpt-4.1": ("openai", "OPENAI_API_KEY", Path("api_keys/openai_key.txt")),
-                "claude-opus-4-5": ("anthropic", "ANTHROPIC_API_KEY", Path("api_keys/anthropic_key.txt")),
-                "gemini-3-pro-preview": ("gemini", "GEMINI_API_KEY", Path("api_keys/gemini_key.txt")),
+                "gpt-4.1": ("openai", "OPENAI_API_KEY"),
+                "claude-opus-4-5": ("anthropic", "ANTHROPIC_API_KEY"),
+                "gemini-3-pro-preview": ("gemini", "GEMINI_API_KEY"),
             }
-            provider, env_var, key_file = provider_map[model]
+            provider, env_var = provider_map[model]
+            judge_cfg = load_config().llm_judge
+            key_file = judge_cfg.api_key_dir / f"{provider}_key.txt"
             key = load_key_file(key_file)
             if not key:
                 raise MissingKeyError(env_var, str(key_file))
             os.environ[env_var] = key
 
-            cfg_judge = load_config().llm_judge
             llm_client = create_judge_client(
                 provider=provider,
                 model=model,
-                base_url=cfg_judge.base_url,
+                base_url=judge_cfg.base_url,
                 api_key_env=env_var,
-                temperature=cfg_judge.temperature,
-                max_tokens=cfg_judge.max_tokens,
-                timeout_s=cfg_judge.timeout_s,
+                temperature=judge_cfg.temperature,
+                max_tokens=judge_cfg.max_tokens,
+                timeout_s=judge_cfg.timeout_s,
             )
 
         domain = input("Enter domain [Model Driven Engineering]: ").strip() or "Model Driven Engineering"
