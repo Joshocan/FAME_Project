@@ -2,7 +2,7 @@
 """CLI for FM coverage evaluation.
 
 Example:
-  PYTHONPATH=$(pwd) .venv/bin/python scripts/eval_fm.py \
+  PYTHONPATH=$(pwd) .venv/bin/python scripts/coverage_fm.py \
       --gt data/ground_truth/federation.xml \
       --pred results/rag/ss-rgfm/fm/ss-rgfm_response_gpt-4.1_2026-02-08T12-19-44.xml
 """
