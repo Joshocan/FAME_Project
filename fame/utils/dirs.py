@@ -35,6 +35,10 @@ class FamePaths:
     modified_prompts: Path
     logs: Path
 
+    # evaluation outputs
+    evaluation_root: Path
+    evaluation_coverage: Path
+
     # non-rag umbrella (generated) - kept for compatibility/convenience
     non_root: Path
     non_fm: Path
@@ -130,6 +134,10 @@ def build_paths(base_dir: Optional[Path] = None) -> FamePaths:
         modified_prompts=results / "modified_prompts",
         logs=results / "logs",
 
+        # evaluation outputs
+        evaluation_root=results / "evaluation",
+        evaluation_coverage=results / "evaluation" / "coverage",
+
         # non-rag umbrella (generated) - kept for compatibility
         non_root=non_root,
         non_fm=non_root / "fm",
@@ -213,6 +221,10 @@ def ensure_for_stage(stage: str, p: FamePaths) -> Dict[str, Path]:
 
     elif stage in ("logs", "log"):
         mk("LOGS", p.logs)
+
+    elif stage in ("evaluation", "eval"):
+        mk("EVAL_ROOT", p.evaluation_root)
+        mk("EVAL_COVERAGE", p.evaluation_coverage)
 
     elif stage in ("notebooks",):
         mk("NOTEBOOKS", p.notebooks)
