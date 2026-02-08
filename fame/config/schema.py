@@ -44,14 +44,14 @@ class OllamaCfg:
 
 @dataclass(frozen=True)
 class LlmJudgeCfg:
-    provider: str
-    model: str
-    base_url: str
-    api_key_env: str
-    api_key_dir: Path
-    temperature: float
-    max_tokens: int
-    timeout_s: int
+    provider: str = "openai"
+    model: str = "gpt-4.1"
+    base_url: str = ""
+    api_key_env: str = "JUDGE_API_KEY"
+    api_key_dir: Path = Path("api_keys")
+    temperature: float = 0.2
+    max_tokens: int = 2048
+    timeout_s: int = 120
 
 
 @dataclass(frozen=True)
