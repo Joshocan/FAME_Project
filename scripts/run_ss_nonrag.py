@@ -23,6 +23,8 @@ def main() -> None:
     ap.add_argument("--max-chunks", type=int, default=int(os.getenv("NONRAG_MAX_CHUNKS", "120")))
     ap.add_argument("--max-chunk-chars", type=int, default=int(os.getenv("NONRAG_MAX_CHUNK_CHARS", "6000")))
     ap.add_argument("--prompt-path", default="", help="Optional prompt file path")
+    ap.add_argument("--xsd-path", default="", help="Override XSD path (default: feature_model_featureide.xsd)")
+    ap.add_argument("--feature-metamodel-path", default="", help="Override feature metamodel path")
     ap.add_argument("--run-tag", default=os.getenv("NONRAG_RUN_TAG", "ss-nonrag"))
     ap.add_argument("--verbose", action="store_true", help="Print stage-by-stage progress")
     ap.add_argument("--interactive", action="store_true", help="Run in interactive mode")
@@ -123,6 +125,8 @@ def main() -> None:
         max_chunks=args.max_chunks,
         max_chunk_chars=args.max_chunk_chars,
         prompt_path=prompt_path,
+        xsd_path=Path(args.xsd_path).expanduser().resolve() if args.xsd_path else None,
+        feature_metamodel_path=Path(args.feature_metamodel_path).expanduser().resolve() if args.feature_metamodel_path else None,
         run_tag=args.run_tag,
         high_level_features=getattr(args, "high_level_features", None),
     )

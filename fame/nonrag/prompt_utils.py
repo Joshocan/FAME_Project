@@ -24,7 +24,7 @@ def build_ss_nonrag_prompt(
     """
     tmpl = load_ss_nonrag_prompt(cfg.prompt_path)
     spec_dir = paths.specifications
-    xsd_path = cfg.xsd_path or (spec_dir / "feature_model_schema.xsd")
+    xsd_path = cfg.xsd_path or (spec_dir / "feature_model_featureide.xsd")
     metamodel_path = cfg.feature_metamodel_path or (spec_dir / "feature_metamodel_specification.txt")
 
     xsd_text = xsd_path.read_text(encoding="utf-8") if xsd_path.exists() else ""

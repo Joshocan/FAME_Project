@@ -32,6 +32,8 @@ def main() -> None:
     ap.add_argument("--collection-prefix", default="")
     ap.add_argument("--batch-size", type=int, default=24)
     ap.add_argument("--interactive", action="store_true", help="Run with guided prompts")
+    ap.add_argument("--xsd-path", default="", help="Override XSD path (default: feature_model_featureide.xsd)")
+    ap.add_argument("--feature-metamodel-path", default="", help="Override feature metamodel path")
     args = ap.parse_args()
 
     interactive = args.interactive or not (args.root_feature and args.domain)
@@ -103,6 +105,8 @@ def main() -> None:
 
     chunks_dir = Path(args.chunks_dir).expanduser().resolve() if args.chunks_dir else None
     prompt_path = Path(args.prompt_path).expanduser() if args.prompt_path else None
+    if prompt_path is None:
+        prompt_path = cfg_yaml.pipelines.ss_rgfm_prompt_path
 
     cfg = SSRGFMConfig(
         root_feature=args.root_feature,
@@ -119,6 +123,8 @@ def main() -> None:
         max_chunk_chars=args.max_chunk_chars,
         prompt_path=prompt_path,
         temperature=args.temperature,
+        xsd_path=Path(args.xsd_path).expanduser().resolve() if args.xsd_path else None,
+        feature_metamodel_path=Path(args.feature_metamodel_path).expanduser().resolve() if args.feature_metamodel_path else None,
         high_level_features=high_level_features,
     )
 

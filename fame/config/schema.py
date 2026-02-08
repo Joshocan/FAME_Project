@@ -119,6 +119,7 @@ class PipelinesCfg:
     ss_rgfm: bool
     ms_rgfm: bool
     is_rgfm: bool
+    ss_rgfm_prompt_path: Optional[Path]
     ss_nonrag: NonRagSSCfg
     is_nonrag: NonRagISCfg
 
@@ -295,6 +296,7 @@ def parse_config(doc: Dict[str, Any], repo_root: Path) -> FameConfig:
         ss_rgfm=ss_rgfm,
         ms_rgfm=ms_rgfm,
         is_rgfm=is_rgfm,
+        ss_rgfm_prompt_path=_as_path(base, (pips.get("ss_rgfm") or {}).get("prompt_path", "")) if str((pips.get("ss_rgfm") or {}).get("prompt_path", "")).strip() else None,
         ss_nonrag=ss_nonrag_cfg,
         is_nonrag=is_nonrag_cfg,
     )

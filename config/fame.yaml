@@ -93,6 +93,7 @@ pipelines:
   # ---------- RAG pipelines ----------
   ss_rgfm:
     enabled: true
+    prompt_path: "prompts/fm_extraction_prompt.txt"
 
   ms_rgfm:
     enabled: true

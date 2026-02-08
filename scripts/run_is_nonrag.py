@@ -22,6 +22,8 @@ def main() -> None:
     ap.add_argument("--max-delta-chunks", type=int, default=int(os.getenv("NONRAG_DELTA_CHUNKS", "50")))
     ap.add_argument("--temperature", type=float, default=float(os.getenv("NONRAG_TEMP", "0.2")))
     ap.add_argument("--interactive", action="store_true", help="Run in interactive mode")
+    ap.add_argument("--xsd-path", default="", help="Override XSD path (default: feature_model_featureide.xsd)")
+    ap.add_argument("--feature-metamodel-path", default="", help="Override feature metamodel path")
     args = ap.parse_args()
 
     interactive = args.interactive or not (args.root_feature and args.domain)
@@ -107,6 +109,8 @@ def main() -> None:
         high_level_features=getattr(args, "high_level_features", None),
         initial_prompt_path=cfg_default.initial_prompt_path,
         iter_prompt_path=cfg_default.iter_prompt_path,
+        xsd_path=Path(args.xsd_path).expanduser().resolve() if args.xsd_path else None,
+        feature_metamodel_path=Path(args.feature_metamodel_path).expanduser().resolve() if args.feature_metamodel_path else None,
     )
 
     model_name = getattr(llm_client, "model", None) or os.getenv("OLLAMA_LLM_MODEL", "ollama-default")

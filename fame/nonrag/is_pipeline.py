@@ -83,6 +83,8 @@ class ISNonRagConfig:
     # prompt overrides
     initial_prompt_path: Optional[Path] = None  # used only for first iteration
     iter_prompt_path: Optional[Path] = None     # used for subsequent iterations
+    xsd_path: Optional[Path] = None
+    feature_metamodel_path: Optional[Path] = None
 
     # high-level features (optional)
     high_level_features: Optional[Dict[str, str]] = None
@@ -132,8 +134,8 @@ refined. No retrieval or vector DB is used.
     ensure_for_stage("is-nonrag", paths)
     ensure_for_stage("preprocess", paths)
     spec_dir = paths.specifications
-    xsd_path = spec_dir / "feature_model_schema.xsd"
-    metamodel_path = spec_dir / "feature_metamodel_specification.txt"
+    xsd_path = cfg.xsd_path or (spec_dir / "feature_model_featureide.xsd")
+    metamodel_path = cfg.feature_metamodel_path or (spec_dir / "feature_metamodel_specification.txt")
     xsd_text = xsd_path.read_text(encoding="utf-8") if xsd_path.exists() else ""
     metamodel_text = metamodel_path.read_text(encoding="utf-8") if metamodel_path.exists() else ""
 
