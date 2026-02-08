@@ -46,7 +46,7 @@ def main() -> None:
         for s in result["skipped"]:
             print(f"  - {s}")
 
-    print("\n✅ Ingestion stage completed successfully.")
+    print("\nSUCCESS: Ingestion stage completed successfully.")
 
 
 if __name__ == "__main__":

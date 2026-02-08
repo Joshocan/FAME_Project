@@ -68,14 +68,14 @@ def _kill_process_on_port(port: int) -> None:
     Uses lsof. Best-effort.
     """
     if not _which("lsof"):
-        print("⚠️  lsof not available; cannot kill by port. Skipping.")
+        print("WARN:  lsof not available; cannot kill by port. Skipping.")
         return
 
     out = _run_quiet(["lsof", "-ti", f"tcp:{port}"])
     pids = [p.strip() for p in out.stdout.splitlines() if p.strip()]
 
     for pid in pids:
-        print(f"⚠️  Killing process on port {port}: PID {pid}")
+        print(f"WARN:  Killing process on port {port}: PID {pid}")
         _run_quiet(["kill", "-TERM", pid])
     time.sleep(1)
 
@@ -83,7 +83,7 @@ def _kill_process_on_port(port: int) -> None:
         # If still alive, SIGKILL
         try:
             os.kill(int(pid), 0)
-            print(f"⚠️  PID {pid} still alive; SIGKILL")
+            print(f"WARN:  PID {pid} still alive; SIGKILL")
             _run_quiet(["kill", "-KILL", pid])
         except Exception:
             pass
@@ -101,7 +101,7 @@ def stop_existing(pid_file: Path, port: int) -> None:
     if pid_file.exists():
         try:
             pid = int(pid_file.read_text().strip())
-            print(f"⚠️  Stopping previous Chroma PID from file: {pid}")
+            print(f"WARN:  Stopping previous Chroma PID from file: {pid}")
             try:
                 os.kill(pid, signal.SIGTERM)
                 time.sleep(1)
@@ -199,7 +199,7 @@ def start_chroma(
             raise RuntimeError(msg)
 
         if _is_healthy(host, port):
-            print(f"✅ Chroma is up at http://{host}:{port}")
+            print(f"SUCCESS: Chroma is up at http://{host}:{port}")
             return proc.pid
 
         time.sleep(1)
@@ -244,5 +244,5 @@ if __name__ == "__main__":
     print(f"Force restart: {force_restart}")
 
     pid = start_chroma(chroma_dir, host=host, port=port, timeout_s=timeout_s, force_restart=force_restart)
-    print(f"✅ ChromaDB running. PID={pid}")
+    print(f"SUCCESS: ChromaDB running. PID={pid}")
     print(f"Try: curl -s http://{host}:{port}/api/v1/heartbeat")

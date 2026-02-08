@@ -10,7 +10,7 @@ if command -v python >/dev/null 2>&1; then
 elif command -v python3 >/dev/null 2>&1; then
   PY=python3
 else
-  echo "❌ Python not found."
+  echo "ERROR: Python not found."
   exit 1
 fi
 
@@ -22,7 +22,7 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Sanity check
 if ! command -v ollama >/dev/null 2>&1; then
-  echo "❌ ollama binary not found on PATH."
+  echo "ERROR: ollama binary not found on PATH."
   echo "Check: which ollama"
   exit 1
 fi

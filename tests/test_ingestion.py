@@ -50,4 +50,4 @@ def test_ingestion_loads_pdf_from_raw() -> None:
     assert isinstance(first_text, str)
     assert len(first_text.strip()) > 20, "Chunk text too short (unexpected)"
 
-    print(f"✅ Ingestion test passed for: {pdf.name}")
+    print(f"SUCCESS: Ingestion test passed for: {pdf.name}")

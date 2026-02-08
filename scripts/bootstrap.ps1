@@ -18,4 +18,4 @@ import nltk
 nltk.download("punkt", quiet=True)
 PY
 
-Write-Output "✅ Bootstrap complete (Windows)."
+Write-Output "SUCCESS: Bootstrap complete (Windows)."

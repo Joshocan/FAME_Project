@@ -115,5 +115,5 @@ def query_many_collections(
                 )
             )
         except Exception as e:
-            print(f"⚠️  Retrieval skipped collection '{c}': {e}")
+            print(f"WARN:  Retrieval skipped collection '{c}': {e}")
     return out

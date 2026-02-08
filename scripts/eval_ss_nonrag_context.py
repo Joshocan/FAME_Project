@@ -92,7 +92,7 @@ def main() -> None:
     out_path = out_dir / f"ss_nonrag_context_stats_{args.model.replace(':', '-').replace('/', '-')}.json"
     out_path.write_text(json.dumps(stats.__dict__, indent=2), encoding="utf-8")
 
-    print(f"✅ Context stats saved to: {out_path}")
+    print(f"SUCCESS: Context stats saved to: {out_path}")
 
 
 if __name__ == "__main__":

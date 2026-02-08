@@ -89,7 +89,7 @@ def upsert_chunks(
             )
             added += len(b_ids)
         except Exception as e:
-            print(f"⚠️  Failed batch upsert ({len(b_ids)} items): {e}")
+            print(f"WARN:  Failed batch upsert ({len(b_ids)} items): {e}")
             failed += len(b_ids)
 
     return added, failed

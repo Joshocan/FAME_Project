@@ -45,7 +45,7 @@ def main() -> None:
     if args.quiet:
         print(json.dumps(payload))
     else:
-        status = "✅" if res.ok else "❌"
+        status = "SUCCESS:" if res.ok else "ERROR:"
         print(f"{status} Well-formed: {res.ok}")
         if res.errors:
             print("Errors:")

@@ -16,4 +16,4 @@ import nltk
 nltk.download("punkt", quiet=True)
 PY
 
-echo "✅ Bootstrap complete (macOS/Linux)."
+echo "SUCCESS: Bootstrap complete (macOS/Linux)."

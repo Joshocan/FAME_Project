@@ -53,7 +53,7 @@ def main() -> None:
                 os.environ["OLLAMA_API_KEY_FILE"] = str(key_path)
                 os.environ.setdefault("OLLAMA_LLM_HOST", "https://ollama.com")
             else:
-                print("⚠️  ollama_key not found. Using local Ollama for LLM.")
+                print("WARN:  ollama_key not found. Using local Ollama for LLM.")
                 os.environ.setdefault("OLLAMA_LLM_HOST", "http://127.0.0.1:11434")
 
             os.environ.setdefault("OLLAMA_EMBED_HOST", "http://127.0.0.1:11434")
@@ -134,7 +134,7 @@ def main() -> None:
     print("Stage 2: Run IS-RGFM pipeline (iterative retrieval)...")
 
     out = run_is_rgfm(cfg, llm=llm_client)
-    print("\n✅ IS-RGFM completed")
+    print("\nSUCCESS: IS-RGFM completed")
     for k, v in out.items():
         print(f"{k}: {v}")
 
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     try:
         main()
     except UserMessageError as e:
-        print(f"❌ {format_error(e)} (see results/logs/fame.log for details)")
+        print(f"ERROR: {format_error(e)} (see results/logs/fame.log for details)")
         log_exception(logger, e)
     except Exception as e:
         log_exception(logger, e)

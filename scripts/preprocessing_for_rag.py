@@ -44,7 +44,7 @@ def ensure_chroma_running(chroma_path: Path, host: str, port: int, timeout_s: in
     Returns PID (0 if already running and we didn't start it).
     """
     if chroma_healthy(host, port):
-        print(f"✅ Chroma already running at http://{host}:{port}")
+        print(f"SUCCESS: Chroma already running at http://{host}:{port}")
         return 0
 
     print("🔧 Chroma not reachable — starting via chroma_service...")
@@ -65,7 +65,7 @@ def ensure_ollama_running(log_dir: Path, timeout_s: int) -> int:
     """
     try:
         verify_running()
-        print("✅ Ollama already running.")
+        print("SUCCESS: Ollama already running.")
         return 0
     except Exception:
         print("🔧 Ollama not reachable — attempting to start locally...")
@@ -86,7 +86,7 @@ def ensure_ollama_embed_model(model: str, host: str) -> None:
 
     if not is_local:
         print(
-            "⚠️  Remote Ollama host detected; skipping auto-pull of embedding model.\n"
+            "WARN:  Remote Ollama host detected; skipping auto-pull of embedding model.\n"
             f"    Ensure '{model}' is available on {host} or set OLLAMA_EMBED_MODEL to a model present there."
         )
         return
@@ -94,7 +94,7 @@ def ensure_ollama_embed_model(model: str, host: str) -> None:
     bin_path = _ollama_bin()
     if not bin_path:
         print(
-            "⚠️  Cannot auto-pull embedding model because 'ollama' binary is not found.\n"
+            "WARN:  Cannot auto-pull embedding model because 'ollama' binary is not found.\n"
             f"    Please pull manually (local host):\n"
             f"      ollama pull {model}\n"
         )
@@ -142,10 +142,10 @@ def main() -> None:
     # ---- Ingestion ----
     print("\n🧩 Running ingestion pipeline...")
     ingest_res = ingest_and_prepare(raw_dir=paths.raw_data, out_dir=paths.processed_data / "chunks")
-    print(f"✅ Ingestion done: processed={len(ingest_res['processed'])}, skipped={len(ingest_res['skipped'])}")
+    print(f"SUCCESS: Ingestion done: processed={len(ingest_res['processed'])}, skipped={len(ingest_res['skipped'])}")
 
     if not ingest_res["processed"]:
-        print("⚠️  No chunks.json produced. Ensure there is at least one PDF in data/raw.")
+        print("WARN:  No chunks.json produced. Ensure there is at least one PDF in data/raw.")
         sys.exit(2)
 
     # ---- Vectorization ----
@@ -155,10 +155,10 @@ def main() -> None:
         batch_size=int(os.getenv("VEC_BATCH_SIZE", "24")),
         collection_prefix=os.getenv("COLLECTION_PREFIX", ""),
     )
-    print("✅ Vectorization done.")
+    print("SUCCESS: Vectorization done.")
     print(vec_res)
 
-    print("\n✅ PREPROCESSING FOR RAG COMPLETE.")
+    print("\nSUCCESS: PREPROCESSING FOR RAG COMPLETE.")
     if chroma_pid:
         print(f"Chroma PID started by this run: {chroma_pid}")
     if ollama_pid:

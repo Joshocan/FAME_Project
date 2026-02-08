@@ -62,11 +62,11 @@ def main() -> None:
     print("===================================================\n")
 
     if not res.chunks:
-        print("⚠️  No results. Check that collections exist and are indexed.")
+        print("WARN:  No results. Check that collections exist and are indexed.")
         return
 
     print(evidence)
-    print("\n✅ Done.")
+    print("\nSUCCESS: Done.")
 
 
 if __name__ == "__main__":

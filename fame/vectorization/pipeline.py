@@ -61,7 +61,7 @@ def index_chunks_json(
         try:
             normalized.append(normalize_chunk_record(c))
         except Exception as e:
-            print(f"⚠️  Skipping invalid chunk: {e}")
+            print(f"WARN:  Skipping invalid chunk: {e}")
 
     if not normalized:
         return {"collection": collection or default_collection_name(chunks_json_path), "added": 0, "failed": 0}

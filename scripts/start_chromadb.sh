@@ -37,7 +37,7 @@ if [[ "$MODE" == "http" ]]; then
 else
   export CHROMA_PATH="${CHROMA_PATH:-data/chroma_db}"
   mkdir -p "$CHROMA_PATH"
-  echo "✅ Chroma persistent mode selected."
+  echo "SUCCESS: Chroma persistent mode selected."
   echo "   Using path: $CHROMA_PATH"
   echo "   No server to start; embeddings will be stored locally."
 fi

@@ -77,7 +77,7 @@ def _pkill_ollama_serve() -> None:
         time.sleep(1)
         _run(["pkill", "-f", "ollama serve"], check=False)
     else:
-        print("⚠️  pkill not found; cannot auto-stop existing ollama serve processes.")
+        print("WARN:  pkill not found; cannot auto-stop existing ollama serve processes.")
 
 
 def stop_existing(pid_file: Path) -> None:
@@ -87,7 +87,7 @@ def stop_existing(pid_file: Path) -> None:
     if pid_file.exists():
         try:
             pid = int(pid_file.read_text().strip())
-            print(f"⚠️  Stopping previous Ollama PID from file: {pid}")
+            print(f"WARN:  Stopping previous Ollama PID from file: {pid}")
             try:
                 os.kill(pid, signal.SIGTERM)
                 time.sleep(1)
@@ -125,7 +125,7 @@ def start_ollama(
     ollama_exe = _ollama_bin()
     if not ollama_exe:
         raise RuntimeError(
-            "❌ Ollama executable not found.\n"
+            "ERROR: Ollama executable not found.\n"
             "You may have only the Python 'ollama' package installed.\n\n"
             "Fix (Homebrew):\n"
             "  brew install ollama\n"
@@ -172,7 +172,7 @@ def start_ollama(
             )
 
         if _is_ollama_running():
-            print(f"✅ Ollama is up at {_base_url()}")
+            print(f"SUCCESS: Ollama is up at {_base_url()}")
             return proc.pid
 
         time.sleep(1)
@@ -192,7 +192,7 @@ def start_ollama(
 def verify_running() -> None:
     if not _is_ollama_running():
         raise RuntimeError(
-            f"❌ Ollama is not reachable at {_base_url()}\n"
+            f"ERROR: Ollama is not reachable at {_base_url()}\n"
             "If using Homebrew service:\n"
             "  brew services start ollama\n"
             "Then check:\n"
@@ -200,7 +200,7 @@ def verify_running() -> None:
             "Or set:\n"
             "  export OLLAMA_HOST=http://<host>:11434"
         )
-    print(f"✅ Ollama reachable at {_base_url()}")
+    print(f"SUCCESS: Ollama reachable at {_base_url()}")
 
 
 # ----------------------------
@@ -224,7 +224,7 @@ def pull_models(models: List[str]) -> None:
         r = _run([ollama_exe, "pull", m], check=False)
         if r.returncode != 0:
             raise RuntimeError(f"Failed to pull model '{m}'.\nSTDERR:\n{r.stderr}\nSTDOUT:\n{r.stdout}")
-        print(f"✅ Model '{m}' pulled (or already present).")
+        print(f"SUCCESS: Model '{m}' pulled (or already present).")
 
 
 def list_models() -> str:
@@ -246,8 +246,8 @@ def verify_models_available(required: List[str]) -> None:
 
     missing = [m for m in required if m not in out]
     if missing:
-        raise RuntimeError(f"❌ Missing models in 'ollama list': {missing}")
-    print(f"✅ All required models are available: {required}")
+        raise RuntimeError(f"ERROR: Missing models in 'ollama list': {missing}")
+    print(f"SUCCESS: All required models are available: {required}")
 
 
 # ----------------------------
@@ -283,7 +283,7 @@ def setup_ollama(
     pull_models([embedding_model, llm_model])
     verify_models_available([embedding_model, llm_model])
 
-    print(f"✅ Ollama ready. Models: '{embedding_model}', '{llm_model}'")
+    print(f"SUCCESS: Ollama ready. Models: '{embedding_model}', '{llm_model}'")
     return pid
 
 
@@ -291,7 +291,7 @@ def stop_ollama(log_dir: str) -> None:
     log_path = Path(log_dir).expanduser().resolve()
     pid_file = log_path / "ollama_serve.pid"
     stop_existing(pid_file)
-    print("✅ Ollama stopped (best-effort).")
+    print("SUCCESS: Ollama stopped (best-effort).")
 
 
 # ----------------------------
@@ -310,7 +310,7 @@ if __name__ == "__main__":
 
     if not llm_model:
         raise RuntimeError(
-            "❌ OLLAMA_LLM_MODEL is not set.\n"
+            "ERROR: OLLAMA_LLM_MODEL is not set.\n"
             "Example:\n"
             "  export OLLAMA_LLM_MODEL=llama3.1:8b\n"
             "  python -m fame.services.ollama_service"
@@ -339,6 +339,6 @@ if __name__ == "__main__":
     )
 
     if mode == "local":
-        print(f"✅ Ollama ready. PID={pid}")
+        print(f"SUCCESS: Ollama ready. PID={pid}")
     else:
-        print("✅ Ollama ready (remote mode).")
+        print("SUCCESS: Ollama ready (remote mode).")

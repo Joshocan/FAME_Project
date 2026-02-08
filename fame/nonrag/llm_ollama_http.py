@@ -92,6 +92,6 @@ def assert_ollama_running(host: Optional[str] = None) -> None:
             raise RuntimeError(f"Ollama not healthy: {r.status_code}")
     except Exception as e:
         raise RuntimeError(
-            f"❌ Ollama is not reachable at {h}. Start Ollama first.\n"
+            f"ERROR: Ollama is not reachable at {h}. Start Ollama first.\n"
             f"Details: {e}"
         )

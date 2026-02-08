@@ -17,7 +17,7 @@ def main() -> None:
     print("===============================")
 
     res = index_all_chunks(batch_size=int(os.getenv("VEC_BATCH_SIZE", "24")))
-    print("\n✅ Vectorization complete.")
+    print("\nSUCCESS: Vectorization complete.")
     print(res)
 
 

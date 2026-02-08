@@ -17,14 +17,14 @@ case "$OS_NAME" in
         expected_resolved="$(cd "${expected}" && pwd -P)"
         actual_resolved="$(cd "${VIRTUAL_ENV}" && pwd -P)"
         if [[ "${actual_resolved}" == "${expected_resolved}" ]]; then
-          echo "✅ Venv activated: ${VIRTUAL_ENV}"
+          echo "SUCCESS: Venv activated: ${VIRTUAL_ENV}"
         else
-          echo "⚠️  Venv activation mismatch."
+          echo "WARN:  Venv activation mismatch."
           echo "   Expected: ${expected}"
           echo "   Actual  : ${VIRTUAL_ENV}"
         fi
       else
-        echo "⚠️  Venv activation not detected. Try: source ${REPO_ROOT}/.venv/bin/activate"
+        echo "WARN:  Venv activation not detected. Try: source ${REPO_ROOT}/.venv/bin/activate"
       fi
     fi
 
@@ -57,21 +57,21 @@ stages = [
 for s in stages:
     ensure_for_stage(s, p)
 
-print(f"✅ Created base directory tree under {p.base_dir}")
+print(f"SUCCESS: Created base directory tree under {p.base_dir}")
 PY
     ;;
   MINGW*|MSYS*|CYGWIN*)
     if command -v powershell >/dev/null 2>&1; then
       powershell -ExecutionPolicy Bypass -File "scripts/bootstrap.ps1"
     else
-      echo "⚠️  PowerShell not found. Run scripts/bootstrap.ps1 manually in PowerShell."
+      echo "WARN:  PowerShell not found. Run scripts/bootstrap.ps1 manually in PowerShell."
       exit 1
     fi
     ;;
   *)
-    echo "⚠️  Unknown OS '$OS_NAME'. Run scripts/bootstrap.sh (macOS/Linux) or scripts/bootstrap.ps1 (Windows) manually."
+    echo "WARN:  Unknown OS '$OS_NAME'. Run scripts/bootstrap.sh (macOS/Linux) or scripts/bootstrap.ps1 (Windows) manually."
     exit 1
     ;;
 esac
 
-echo "✅ Initial setup complete."
+echo "SUCCESS: Initial setup complete."

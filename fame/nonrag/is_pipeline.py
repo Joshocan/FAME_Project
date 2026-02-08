@@ -269,7 +269,7 @@ refined. No retrieval or vector DB is used.
     }
     meta_file.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
-    print(f"✅ IS-NonRAG finished. Final FM: {final_xml_file}")
+    print(f"SUCCESS: IS-NonRAG finished. Final FM: {final_xml_file}")
 
     return {
         "final_xml": str(final_xml_file),

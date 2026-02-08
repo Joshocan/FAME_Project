@@ -18,4 +18,4 @@ import nltk
 nltk.download("punkt", quiet=True)
 PY
 
-echo "✅ Requirements installed into ${VENV_DIR} and NLTK punkt downloaded."
+echo "SUCCESS: Requirements installed into ${VENV_DIR} and NLTK punkt downloaded."

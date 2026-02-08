@@ -7,7 +7,7 @@ cd "$REPO_ROOT"
 PYTHON="${REPO_ROOT}/.venv/bin/python"
 
 if [[ ! -x "$PYTHON" ]]; then
-  echo "⚠️  .venv not found or Python missing. Run scripts/initial_setup.sh first." >&2
+  echo "WARN:  .venv not found or Python missing. Run scripts/initial_setup.sh first." >&2
   exit 1
 fi
 
@@ -26,8 +26,8 @@ echo "====================================================="
 read -r -p "Run preprocessing (ingestion + vectorization) now? [Y/n]: " run_pre
 if [[ -z "${run_pre}" || "${run_pre}" =~ ^[Yy] ]]; then
   echo "\n🧩 Running preprocessing_for_rag.py ..."
-  "$PYTHON" scripts/preprocessing_for_rag.py || { echo "❌ Preprocessing failed"; exit 1; }
-  echo "✅ Preprocessing finished"
+  "$PYTHON" scripts/preprocessing_for_rag.py || { echo "ERROR: Preprocessing failed"; exit 1; }
+  echo "SUCCESS: Preprocessing finished"
 else
   echo "⏩ Skipping preprocessing"
 fi
@@ -76,4 +76,4 @@ case "$family" in
   *) echo "Invalid family choice"; exit 1 ;;
 esac
 
-echo "\n✅ FAME run completed"
+echo "\nSUCCESS: FAME run completed"

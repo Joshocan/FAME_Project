@@ -20,4 +20,4 @@ fi
 
 "${VENV_DIR}/bin/python" -m scripts.run_ingestion
 
-echo "✅ Ingestion stage finished."
+echo "SUCCESS: Ingestion stage finished."

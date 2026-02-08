@@ -80,7 +80,7 @@ def ingest_and_prepare(
             out_json = ingest_one_file(fp, out_dir=chunks_out_dir)
             processed.append(out_json)
         except Exception as e:
-            print(f"⚠️  Skipping {Path(fp).name}: {e}")
+            print(f"WARN:  Skipping {Path(fp).name}: {e}")
             skipped.append(Path(fp))
 
     return {"processed": processed, "skipped": skipped}
@@ -88,6 +88,6 @@ def ingest_and_prepare(
 
 if __name__ == "__main__":
     result = ingest_and_prepare()
-    print(f"✅ Ingestion complete. Processed: {len(result['processed'])}, Skipped: {len(result['skipped'])}")
+    print(f"SUCCESS: Ingestion complete. Processed: {len(result['processed'])}, Skipped: {len(result['skipped'])}")
     if result["processed"]:
         print("Example output:", result["processed"][0])

@@ -23,7 +23,7 @@ VENV_PY = REPO_ROOT / ".venv" / "bin" / "python"
 
 
 def die(msg: str) -> None:
-    print(f"❌ {msg}", file=sys.stderr)
+    print(f"ERROR: {msg}", file=sys.stderr)
     sys.exit(1)
 
 
@@ -97,7 +97,7 @@ def main() -> None:
         else:
             run([str(py), "scripts/run_is_nonrag.py", "--interactive"])
 
-    print("\n✅ FAME run completed")
+    print("\nSUCCESS: FAME run completed")
 
 
 if __name__ == "__main__":
