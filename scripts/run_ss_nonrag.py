@@ -85,16 +85,19 @@ def main() -> None:
         domain = input("Enter domain [Model Driven Engineering]: ").strip() or "Model Driven Engineering"
         root_feature = input("Enter root feature [Model Federation]: ").strip() or "Model Federation"
 
-        high_level = input("Include high-level features? (y/N): ").strip().lower()
-        high_level_features = None
-        if high_level in ("y", "yes"):
-            features = default_high_level_features()
-            print("\nHigh-level features:")
+        high_level = input("Include high-level features? (Y/n): ").strip().lower()
+        features = default_high_level_features()
+        if high_level not in ("n", "no"):
+            print("\nHigh-level features (default):")
             for k, v in features.items():
                 print(f"- {k}: {v}")
             confirm = input("Use these? (Y/n): ").strip().lower()
-            if confirm in ("", "y", "yes"):
+            if confirm in ("n", "no"):
+                high_level_features = None
+            else:
                 high_level_features = features
+        else:
+            high_level_features = None
 
         args.domain = domain
         args.root_feature = root_feature

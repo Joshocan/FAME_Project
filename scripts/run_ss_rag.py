@@ -94,14 +94,16 @@ def main() -> None:
         args.domain = domain
         args.root_feature = root_feature
 
-        hl = input("Include high-level features? (y/N): ").strip().lower()
-        if hl in ("y", "yes"):
-            feats = default_high_level_features()
-            print("\nHigh-level features:")
+        hl = input("Include high-level features? (Y/n): ").strip().lower()
+        feats = default_high_level_features()
+        if hl not in ("n", "no"):
+            print("\nHigh-level features (default):")
             for k, v in feats.items():
                 print(f"- {k}: {v}")
             confirm = input("Use these? (Y/n): ").strip().lower()
-            if confirm in ("", "y", "yes", ""):
+            if confirm in ("n", "no"):
+                high_level_features = None
+            else:
                 high_level_features = feats
 
     chunks_dir = Path(args.chunks_dir).expanduser().resolve() if args.chunks_dir else None
