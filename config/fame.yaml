@@ -100,6 +100,8 @@ pipelines:
 
   is_rgfm:
     enabled: true
+    initial_prompt_path: "prompts/fm_extraction_prompt.txt"
+    iter_prompt_path: "prompts/fm_iterated_prompt.txt"
 
   # ---------- NON-RAG pipelines ----------
   ss_nonrag:
