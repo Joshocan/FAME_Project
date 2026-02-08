@@ -74,16 +74,28 @@ def ensure_ollama_running(log_dir: Path, timeout_s: int) -> int:
         return pid
 
 
-def ensure_ollama_embed_model(model: str) -> None:
+def ensure_ollama_embed_model(model: str, host: str) -> None:
     """
     Best-effort pull of embedding model.
-    Requires the local 'ollama' binary on PATH (or OLLAMA_BIN).
+
+    If host is remote (not localhost/127.0.0.1), we avoid auto-pull because the
+    model catalog is controlled by that service. In that case we simply warn.
     """
+    host_lower = host.lower()
+    is_local = any(h in host_lower for h in ["127.0.0.1", "localhost"])
+
+    if not is_local:
+        print(
+            "⚠️  Remote Ollama host detected; skipping auto-pull of embedding model.\n"
+            f"    Ensure '{model}' is available on {host} or set OLLAMA_EMBED_MODEL to a model present there."
+        )
+        return
+
     bin_path = _ollama_bin()
     if not bin_path:
         print(
             "⚠️  Cannot auto-pull embedding model because 'ollama' binary is not found.\n"
-            f"    Please pull manually:\n"
+            f"    Please pull manually (local host):\n"
             f"      ollama pull {model}\n"
         )
         return
@@ -125,7 +137,7 @@ def main() -> None:
     # ---- Ensure services ----
     chroma_pid = ensure_chroma_running(chroma_path, chroma_host, chroma_port, chroma_timeout)
     ollama_pid = ensure_ollama_running(ollama_log_dir, ollama_timeout)
-    ensure_ollama_embed_model(embed_model)
+    ensure_ollama_embed_model(embed_model, os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434"))
 
     # ---- Ingestion ----
     print("\n🧩 Running ingestion pipeline...")
