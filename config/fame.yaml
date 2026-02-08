@@ -42,7 +42,7 @@ services:
     # Environment variable that holds your API key
     api_key_env: "JUDGE_API_KEY"
     temperature: 0.2
-    max_tokens: 2048
+    max_tokens: 8000
     timeout_s: 120
 
 data:

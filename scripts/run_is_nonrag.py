@@ -53,12 +53,12 @@ def main() -> None:
         else:
             model = prompt_choice(
                 "Select Judge LLM model",
-                ("gpt-4.1", "claude-opus", "gemini-3"),
+                ("gpt-4.1", "claude-opus-4-5", "gemini-3-pro-preview"),
             )
             provider_map = {
                 "gpt-4.1": ("openai", "OPENAI_API_KEY", Path("api_keys/openai_key.txt")),
-                "claude-opus": ("anthropic", "ANTHROPIC_API_KEY", Path("api_keys/anthropic_key.txt")),
-                "gemini-3": ("gemini", "GEMINI_API_KEY", Path("api_keys/gemini_key.txt")),
+                "claude-opus-4-5": ("anthropic", "ANTHROPIC_API_KEY", Path("api_keys/anthropic_key.txt")),
+                "gemini-3-pro-preview": ("gemini", "GEMINI_API_KEY", Path("api_keys/gemini_key.txt")),
             }
             provider, env_var, key_file = provider_map[model]
             key = load_key_file(key_file)
