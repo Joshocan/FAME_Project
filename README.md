@@ -23,7 +23,7 @@ PYTHONPATH=$(pwd) .venv/bin/python scripts/run_fame.py
     --gt data/ground_truth/federation.xml \
     --pred results/rag/ss-rgfm/fm/your_model.xml
   ```
-- Well-formedness/XSD check:
+- Conformance/XSD check:
   ```bash
   PYTHONPATH=$(pwd) .venv/bin/python scripts/check_wellformed.py \
     --xml results/rag/ss-rgfm/fm/your_model.xml \
