@@ -146,6 +146,20 @@ class LoggingCfg:
 
 
 @dataclass(frozen=True)
+class EvaluationCoverageCfg:
+    model_name: str
+    similarity_threshold: float
+    top_k: int
+    feature_weight: float
+    parent_weight: float
+
+
+@dataclass(frozen=True)
+class EvaluationCfg:
+    coverage: EvaluationCoverageCfg
+
+
+@dataclass(frozen=True)
 class FameConfig:
     project: ProjectCfg
     chroma: ChromaCfg
@@ -159,6 +173,7 @@ class FameConfig:
     pipelines: PipelinesCfg
     outputs: OutputsCfg
     logging: LoggingCfg
+    evaluation: EvaluationCfg
 
 
 def load_yaml_config(path: str | Path) -> Dict[str, Any]:
@@ -327,6 +342,19 @@ def parse_config(doc: Dict[str, Any], repo_root: Path) -> FameConfig:
         console_include_exc=bool(log.get("console_include_exc", False)),
     )
 
+    # Evaluation
+    eval_doc = doc.get("evaluation", {})
+    cov_doc = eval_doc.get("coverage", {})
+    eval_cfg = EvaluationCfg(
+        coverage=EvaluationCoverageCfg(
+            model_name=str(cov_doc.get("model_name", "all-mpnet-base-v2")),
+            similarity_threshold=float(cov_doc.get("similarity_threshold", 0.35)),
+            top_k=int(cov_doc.get("top_k", 3)),
+            feature_weight=float(cov_doc.get("feature_weight", 0.9)),
+            parent_weight=float(cov_doc.get("parent_weight", 0.1)),
+        )
+    )
+
     return FameConfig(
         project=project,
         chroma=chroma_cfg,
@@ -340,4 +368,5 @@ def parse_config(doc: Dict[str, Any], repo_root: Path) -> FameConfig:
         pipelines=pipelines_cfg,
         outputs=outputs_cfg,
         logging=logging_cfg,
+        evaluation=eval_cfg,
     )

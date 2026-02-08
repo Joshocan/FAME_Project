@@ -142,3 +142,11 @@ logging:
   console: true
   console_level: "WARNING"
   console_include_exc: false
+
+evaluation:
+  coverage:
+    model_name: "all-mpnet-base-v2"
+    similarity_threshold: 0.35
+    top_k: 3
+    feature_weight: 0.9
+    parent_weight: 0.1

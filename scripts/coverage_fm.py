@@ -22,11 +22,11 @@ def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Evaluate FM coverage (semantic recall)")
     ap.add_argument("--gt", required=True, help="Ground-truth FeatureIDE XML")
     ap.add_argument("--pred", required=True, help="Predicted/generated FeatureIDE XML")
-    ap.add_argument("--model", default="all-mpnet-base-v2", help="SentenceTransformer model")
-    ap.add_argument("--threshold", type=float, default=0.35, help="Similarity threshold")
-    ap.add_argument("--top-k", type=int, default=3, help="Top-k matches to consider")
-    ap.add_argument("--feature-weight", type=float, default=0.9, help="Weight for node similarity")
-    ap.add_argument("--parent-weight", type=float, default=0.1, help="Weight for parent similarity")
+    ap.add_argument("--model", help="SentenceTransformer model (overrides config)")
+    ap.add_argument("--threshold", type=float, help="Similarity threshold (overrides config)")
+    ap.add_argument("--top-k", type=int, help="Top-k matches to consider (overrides config)")
+    ap.add_argument("--feature-weight", type=float, help="Weight for node similarity (overrides config)")
+    ap.add_argument("--parent-weight", type=float, help="Weight for parent similarity (overrides config)")
     ap.add_argument("--quiet", action="store_true", help="Suppress per-node output")
     return ap.parse_args()
 
@@ -36,12 +36,17 @@ def main() -> None:
     paths = build_paths()
     ensure_for_stage("evaluation", paths)
 
+    # Load defaults from config, then allow CLI overrides
+    from fame.config.load import load_config
+
+    cfg_doc = load_config()
+    cov_cfg = cfg_doc.evaluation.coverage
     cfg = CoverageConfig(
-        model_name=args.model,
-        similarity_threshold=args.threshold,
-        top_k=args.top_k,
-        feature_weight=args.feature_weight,
-        parent_weight=args.parent_weight,
+        model_name=args.model or cov_cfg.model_name,
+        similarity_threshold=args.threshold if args.threshold is not None else cov_cfg.similarity_threshold,
+        top_k=args.top_k if args.top_k is not None else cov_cfg.top_k,
+        feature_weight=args.feature_weight if args.feature_weight is not None else cov_cfg.feature_weight,
+        parent_weight=args.parent_weight if args.parent_weight is not None else cov_cfg.parent_weight,
     )
 
     evaluator = CoverageEvaluator(cfg)

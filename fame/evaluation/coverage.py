@@ -46,18 +46,18 @@ def extract_nodes(xml_file: Union[Path, str]) -> List[Node]:
 
 @dataclass
 class CoverageConfig:
-    model_name: str = "all-mpnet-base-v2"
-    similarity_threshold: float = 0.35
-    top_k: int = 3
-    feature_weight: float = 0.9
-    parent_weight: float = 0.1
+    model_name: str
+    similarity_threshold: float
+    top_k: int
+    feature_weight: float
+    parent_weight: float
 
 
 class CoverageEvaluator:
     """Semantic coverage (recall) of AUTO FM vs HUMAN FM."""
 
-    def __init__(self, cfg: CoverageConfig | None = None):
-        self.cfg = cfg or CoverageConfig()
+    def __init__(self, cfg: CoverageConfig):
+        self.cfg = cfg
         self.model = SentenceTransformer(self.cfg.model_name)
 
     def _encode(self, texts: Iterable[str]):
