@@ -1,75 +1,56 @@
-# Feature Argumentation Modelling Environment  (FAME) Project
+# Feature Argumentation Modelling Environment (FAME)
 
-## Setup (Automated)
+FAME builds feature models from documents using Retrieval‑Augmented (RAG) and Non‑RAG pipelines.
 
-Use the setup script to create the virtual environment and install all requirements.
+## 1) Initial setup (once)
+- See [SETUP.md](SETUP.md) for details.
+- TL;DR (macOS/Linux):
+  ```bash
+  ./scripts/initial_setup.sh
+  ```
 
-macOS/Linux:
+## 2) End‑to‑end launcher (recommended)
+Runs optional preprocessing, then lets you pick RAG / Non‑RAG and SS / IS variants.
+
 ```bash
-./scripts/initial_setup.sh
+PYTHONPATH=$(pwd) .venv/bin/python scripts/run_fame.py
 ```
 
-Windows (PowerShell):
-```powershell
-.\scripts\bootstrap.ps1
-```
+## 3) Run individual steps
+All commands assume the venv is active (`source .venv/bin/activate`) and `PYTHONPATH=$(pwd)`.
 
-### Running scripts and tests
-
-macOS/Linux:
+### Preprocessing (ingest + vectorize)
 ```bash
-./scripts/run_ingestion.sh
-./scripts/run_tests.sh tests/test_ingestion.py -v
+PYTHONPATH=$(pwd) .venv/bin/python scripts/preprocessing_for_rag.py
 ```
 
-Windows (PowerShell):
-```powershell
-.\scripts\bootstrap.ps1
-.venv\Scripts\python scripts\preprocessing_for_rag.py
-.venv\Scripts\python -m pytest tests\test_ingestion.py -v
-```
-
-## Ollama API Key (if your Ollama server is secured)
-
-Local Ollama does not require an API key by default. If your Ollama server is behind an auth proxy or a secured/managed deployment, obtain the API key from your hosting provider/admin and set:
-
-macOS/Linux:
+### Single‑Stage Non‑RAG (SS‑NonRAG)
 ```bash
-export OLLAMA_API_KEY="your_key_here"
+PYTHONPATH=$(pwd) .venv/bin/python scripts/run_ss_nonrag.py --interactive
 ```
 
-Windows (PowerShell):
-```powershell
-$env:OLLAMA_API_KEY="your_key_here"
-```
-
-This key is used for both embeddings and generation requests.
-
-Tip: if you store the key in `api_keys/ollama_key.txt`, you can load it like this:
-
-macOS/Linux:
+### Iterative Non‑RAG (IS‑NonRAG)
 ```bash
-export OLLAMA_API_KEY="$(cat api_keys/ollama_key.txt)"
+PYTHONPATH=$(pwd) .venv/bin/python scripts/run_is_nonrag.py --interactive
 ```
 
-Windows (PowerShell):
-```powershell
-$env:OLLAMA_API_KEY = Get-Content -Raw api_keys/ollama_key.txt
-```
-
-### Local embeddings + cloud LLM (recommended)
-
-If your Ollama cloud account does not support embeddings, you can split hosts:
-
-macOS/Linux:
+### Single‑Stage RAG (SS‑RGFM)
 ```bash
-export OLLAMA_EMBED_HOST="http://127.0.0.1:11434"
-export OLLAMA_LLM_HOST="https://ollama.com"
-export OLLAMA_API_KEY_FILE=api_keys/ollama_key.txt
+PYTHONPATH=$(pwd) .venv/bin/python scripts/run_ss_rag.py --interactive
 ```
 
-If no API key is provided, the LLM defaults to local Ollama.
+### Iterative RAG (IS‑RGFM)
+```bash
+PYTHONPATH=$(pwd) .venv/bin/python scripts/run_is_rag.py --interactive
+```
 
-Notes:
-- LLM generation uses `OLLAMA_LLM_HOST` (see `fame/nonrag/llm_ollama_http.py`).
-- Embeddings use `OLLAMA_EMBED_HOST` (see `fame/vectorization/embeddings.py`).
+## 4) Ollama host hints
+- Embeddings typically run on a local Ollama host: `OLLAMA_EMBED_HOST=http://127.0.0.1:11434`.
+- LLM generation can use cloud: `OLLAMA_LLM_HOST=https://ollama.com`.
+Set these before running preprocessing/pipelines if you split hosts.
+
+## 5) Logs & outputs
+- Results: `results/` (FM XMLs, prompts, stats, etc.)
+- Logs: `results/logs/fame.log` (structured JSON)
+
+For more setup detail, read [SETUP.md](SETUP.md).
