@@ -13,7 +13,7 @@ class GeminiJudgeClient(JudgeClient):
     Google Gemini judge client using generateContent API.
     """
 
-    def generate(self, prompt: str, *, system: Optional[str] = None) -> str:
+    def generate(self, prompt: str, *, system: Optional[str] = None, temperature: Optional[float] = None) -> str:
         api_key = self._get_api_key()
         if not api_key:
             raise RuntimeError(f"Missing API key in env var '{self.api_key_env}'")
@@ -28,7 +28,7 @@ class GeminiJudgeClient(JudgeClient):
         payload = {
             "contents": contents,
             "generationConfig": {
-                "temperature": self.temperature,
+                "temperature": temperature if temperature is not None else self.temperature,
                 "maxOutputTokens": self.max_tokens,
             },
         }

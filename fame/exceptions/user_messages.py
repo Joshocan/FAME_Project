@@ -29,8 +29,10 @@ class LLMTimeoutError(UserMessageError):
 class MissingKeyError(UserMessageError):
     def __init__(self, key_name: str, path: str):
         super().__init__(
-            f"API key '{key_name}' not found. Expected at: {path}. "
-            "Add the key file or set the environment variable."
+            f"API key '{key_name}' not found. Provide it by either:\n"
+            f"- placing the key file at: {path}\n"
+            f"- OR exporting the env var {key_name} in your shell.\n"
+            "Then rerun the command."
         )
 
 

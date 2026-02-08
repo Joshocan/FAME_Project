@@ -13,7 +13,7 @@ class OpenAIJudgeClient(JudgeClient):
     OpenAI judge client using Chat Completions.
     """
 
-    def generate(self, prompt: str, *, system: Optional[str] = None) -> str:
+    def generate(self, prompt: str, *, system: Optional[str] = None, temperature: Optional[float] = None) -> str:
         api_key = self._get_api_key()
         if not api_key:
             raise RuntimeError(f"Missing API key in env var '{self.api_key_env}'")
@@ -29,7 +29,7 @@ class OpenAIJudgeClient(JudgeClient):
         payload = {
             "model": self.model,
             "messages": messages,
-            "temperature": self.temperature,
+            "temperature": temperature if temperature is not None else self.temperature,
             "max_tokens": self.max_tokens,
         }
 

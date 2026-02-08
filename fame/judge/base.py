@@ -17,5 +17,5 @@ class JudgeClient:
     def _get_api_key(self) -> str:
         return os.getenv(self.api_key_env, "").strip()
 
-    def generate(self, prompt: str, *, system: Optional[str] = None) -> str:
+    def generate(self, prompt: str, *, system: Optional[str] = None, temperature: Optional[float] = None) -> str:
         raise NotImplementedError

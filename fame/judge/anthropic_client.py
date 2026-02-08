@@ -14,7 +14,7 @@ class AnthropicJudgeClient(JudgeClient):
     Anthropic judge client using Messages API.
     """
 
-    def generate(self, prompt: str, *, system: Optional[str] = None) -> str:
+    def generate(self, prompt: str, *, system: Optional[str] = None, temperature: Optional[float] = None) -> str:
         api_key = self._get_api_key()
         if not api_key:
             raise RuntimeError(f"Missing API key in env var '{self.api_key_env}'")
@@ -25,7 +25,7 @@ class AnthropicJudgeClient(JudgeClient):
         payload = {
             "model": self.model,
             "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
+            "temperature": temperature if temperature is not None else self.temperature,
             "messages": [{"role": "user", "content": prompt}],
         }
         if system:
