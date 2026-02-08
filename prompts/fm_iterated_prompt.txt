@@ -72,10 +72,9 @@ INCREMENTAL REFINEMENT RULES (CRITICAL):
 6) Variability semantics:
    - mandatory="true" ONLY when NEW CONTEXT explicitly indicates “must/required/mandatory”.
    - Otherwise omit mandatory.
-   - Use group operators:
-     <and> for co-existing decomposition,
-     <or> for one-or-more choices,
-     <alt> for exactly-one choices (only if explicitly indicated).
+   - Use group operators: <and> for co-existing decomposition, <or> for one-or-more choices, <alt> for exactly-one choices (only if explicitly indicated).
+   - Mark OR vs XOR groups explicitly; do not mix them in a single group.
+   - Deduplicate synonymous features; keep the most expressive name.
 
 7) Constraints (only if explicit in NEW CONTEXT):
    - Requires(A,B): <rule><imp><var>A</var><var>B</var></imp></rule>
@@ -86,6 +85,11 @@ INCREMENTAL REFINEMENT RULES (CRITICAL):
    - Keep good existing descriptions from PREVIOUS_FM_XML.
    - If you move a node, update its description if needed to remain accurate.
    - Any NEW node must have a description grounded in NEW CONTEXT.
+
+OUTPUT HYGIENE (STRICT)
+- Produce ONLY XML (no Markdown). The XML MUST be well-formed and validate against the XSD.
+- No text before <?xml ...?> and no text after </featureModel>.
+- Stop generation immediately after writing the closing </featureModel>.
 
 PROCESS (THINK SILENTLY; OUTPUT ONLY XML):
 Step A: Parse PREVIOUS_FM_XML mentally; build an internal list of existing feature names and their hierarchy.

@@ -32,19 +32,24 @@ D) Variability modeling rules
    - XOR (alternative) vs OR
    - “agnostic / other / hybrid / multiple / X” options when mentioned or implied
 9) If you are unsure whether a feature is required, mark it OPTIONAL (default-to-optional).
+10) Mark OR vs XOR groups explicitly; do not mix them in one group.
 
-E) Evidence and fidelity
-10) Use terminology from the paper as feature names where possible.
-11) Do not omit details because they seem “too specific” if they appear as concepts/examples in the paper.
-12) Use ONLY features and constraints evidenced in the CONTEXT. Do NOT invent.
+E) Naming and deduplication
+11) Deduplicate synonymous features; keep the most expressive, evidence-backed name.
+
+F) Evidence and fidelity
+12) Use terminology from the paper as feature names where possible.
+13) Do not omit details because they seem “too specific” if they appear as concepts/examples in the paper.
+14) Use ONLY features and constraints evidenced in the CONTEXT. Do NOT invent.
 
 OUTPUT REQUIREMENTS (STRICT)
-13) Produce a single FeatureIDE-compatible XML feature model.
-14) Output ONLY the XML. No markdown, no explanations, no commentary.
-15) The XML MUST be well-formed and MUST validate against: XSD METAMODEL below. There must be **no text before the opening `<?xml ...?>`** and **no text after the closing `</featureModel>`**.
-16) Every feature/group node MUST include exactly one <description> element with at least one full sentence explaining its role.
-17) Use mandatory="true" ONLY when the text clearly indicates “must/required/mandatory”; otherwise omit it.
-18) Feature name convention (FeatureIDE-compatible): feature names must be identifiers (start with a letter/underscore; then letters/digits/underscore/hyphen only). NO spaces or other punctuation. Replace spaces with underscores or hyphens.
+15) Produce a single FeatureIDE-compatible XML feature model.
+16) Output ONLY the XML. No markdown, no explanations, no commentary.
+17) The XML MUST be well-formed and MUST validate against: XSD METAMODEL below. There must be **no text before the opening `<?xml ...?>`** and **no text after the closing `</featureModel>`**.
+18) Every feature/group node MUST include exactly one <description> element with at least one full sentence explaining its role.
+19) Use mandatory="true" ONLY when the text clearly indicates “must/required/mandatory”; otherwise omit it.
+20) Feature name convention (FeatureIDE-compatible): feature names must be identifiers (start with a letter/underscore; then letters/digits/underscore/hyphen only). NO spaces or other punctuation. Replace spaces with underscores or hyphens.
+21) Stop generation immediately after writing the closing </featureModel> tag.
 
 TRACEABILITY & SEMANTIC VALIDATION RULES (CRITICAL):
 - Every feature MUST include exactly ONE <description> element (≥ 1 full sentence).
